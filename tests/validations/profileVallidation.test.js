@@ -5,7 +5,7 @@ const {
 const chai = require("chai");
 const expect = chai.expect;
 
-describe.only("Profile Validations", () => {
+describe("Profile Validations", () => {
   describe("create schema", () => {
     it("should validate a valid update Schema object", () => {
       const validJsonObject = {
