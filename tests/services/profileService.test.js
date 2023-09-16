@@ -6,41 +6,8 @@ describe("Profile Service", () => {
   let service;
   let mockRepo;
 
-  const validJsonObject = {
-    validField: "validData",
-  };
-
-  const jsonObject = {
-    id: 1,
-    validField: "validData",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  const jsonObjectArray = [
-    {
-      id: 1,
-      validField: "validData1",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 2,
-      validField: "validData2",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: 3,
-      validField: "validData3",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ];
-
   const setupService = () => {
     createSchema = { validate: sinon.stub() };
-
     updateSchema = { validate: sinon.stub() };
 
     mockRepo = {
@@ -60,7 +27,10 @@ describe("Profile Service", () => {
 
   describe("Create", () => {
     it("should return success message and created resource for a valid request", async () => {
-      // Arrange
+      // Arrange'
+      const validJsonObject = {
+        validField: "validData",
+      };
       const mockRepo = {
         create: sinon.stub().resolves(1),
       };
@@ -99,6 +69,26 @@ describe("Profile Service", () => {
   describe("read all", () => {
     it("should respond with an array of objects", async () => {
       // Arrange
+      const jsonObjectArray = [
+        {
+          id: 1,
+          validField: "validData1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          validField: "validData2",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 3,
+          validField: "validData3",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
       mockRepo.findAll.resolves(jsonObjectArray);
 
       // Act
@@ -149,6 +139,12 @@ describe("Profile Service", () => {
   describe("read one", () => {
     it("should return resource with provided PK", async () => {
       // Arrange
+      const jsonObject = {
+        id: 1,
+        validField: "validData",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       mockRepo.findByPk.resolves(jsonObject);
       const id = 1; // valid
 
