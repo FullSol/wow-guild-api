@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const Service = require("../../services/profileService");
 const { AggregateError, json } = require("sequelize");
+const { invalid } = require("joi");
 
 describe.only("Profile Service", () => {
   const jsonObjectArray = [
@@ -157,6 +158,78 @@ describe.only("Profile Service", () => {
       } catch (error) {
         // Assert
         expect(mockRepo.findAll.called).to.be.true;
+        expect(error.constructor.name).to.equal("Error");
+        expect(error.message).to.equal(`Internal Server Error`);
+      }
+    });
+  });
+
+  describe("read one", () => {
+    it("should return resource with provided PK", async () => {
+      // Arrange
+      const jsonObject = {
+        id: 1,
+        validField: "validData",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const mockRepo = {
+        findByPk: sinon.stub().resolves(jsonObject),
+      };
+
+      const id = 1;
+      const service = new Service(mockRepo);
+
+      // Act
+      const result = await service.readOne(id);
+
+      // Assert
+      expect(mockRepo.findByPk.called).to.be.true;
+      expect(result).to.equal(jsonObject);
+    });
+
+    it("should handle missing id request", async () => {
+      // Arrange
+      const invalidId = null; // This should cause an error
+      const mockRepo = {
+        findByPk: sinon
+          .stub()
+          .throws(new Error("Resource ID must be numerical")),
+      };
+      const service = new Service(mockRepo);
+
+      try {
+        // Act
+        await service.readOne(invalidId);
+
+        // If no error is thrown, fail the test
+        expect.fail("Expected Error, but no error was thrown.");
+      } catch (error) {
+        // Assert
+        expect(error.constructor.name).to.equal("Error");
+        expect(error.message).to.equal("Resource ID must be numerical");
+        expect(mockRepo.findByPk.called).to.be.false;
+      }
+    });
+
+    it("should respond with a 500 Internal service error from the service", async () => {
+      // Arrange
+      const id = 1;
+      const mockRepo = {
+        findByPk: sinon.stub().throws(new Error("Internal Server Error")),
+      };
+
+      const service = new Service(mockRepo);
+
+      try {
+        // Act
+        await service.readOne(id);
+
+        // If no error is thrown, fail the test
+        expect.fail("Expected ValidationError, but no error was thrown.");
+      } catch (error) {
+        // Assert
+        expect(mockRepo.findByPk.called).true;
         expect(error.constructor.name).to.equal("Error");
         expect(error.message).to.equal(`Internal Server Error`);
       }
