@@ -52,8 +52,10 @@ class ProfileService {
           "Unable to validate the submitted resource"
         );
 
-      //return results
+      // Attempt to insert the new object
       const result = this.Repo.create(resourceData);
+
+      // Return the results
       return result;
     } catch (error) {
       throw error;
