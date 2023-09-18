@@ -5,12 +5,9 @@ const {
   updateSchema,
 } = require("../validations/profileValidations");
 
-class AggregateValidationError extends AggregateError {
-  constructor(arg1, arg2) {
-    super(arg1, arg2);
-    this.name = "ValidationError";
-  }
-}
+const {
+  AggregateValidationError,
+} = require("../errors/custom/AggregateValidationError");
 
 const createErrorsArray = (error) => {
   try {
