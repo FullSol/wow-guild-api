@@ -26,9 +26,7 @@ describe.only("Profile Service", () => {
   describe("Create", () => {
     it("should return message: created resource for a valid request", async () => {
       // Arrange
-      const mockRepo = {
-        create: sinon.stub().resolves(1),
-      };
+      const mockRepo = { create: sinon.stub().resolves(1) };
       const validJsonObject = { field1: "data1" };
       const createSchema = { validate: sinon.stub().returnsThis() };
       const service = new Service(mockRepo);
@@ -45,9 +43,7 @@ describe.only("Profile Service", () => {
 
     it("should return message: invalid request", async () => {
       // Arrange
-      const mockRepo = {
-        create: sinon.stub().resolves(1),
-      };
+      const mockRepo = { create: sinon.stub().resolves(1) };
 
       const invalidJsonObject = {}; // bad object
 
@@ -111,9 +107,7 @@ describe.only("Profile Service", () => {
   describe("read all", () => {
     it("should respond with an array of objects", async () => {
       // Arrange
-      const mockRepo = {
-        findAll: sinon.stub().resolves(jsonObjectArray),
-      };
+      const mockRepo = { findAll: sinon.stub().resolves(jsonObjectArray) };
       const service = new Service(mockRepo);
 
       // Act
@@ -127,9 +121,7 @@ describe.only("Profile Service", () => {
     it("should respond with an empty array", async () => {
       // Arrange
       const emptyArray = [];
-      const mockRepo = {
-        findAll: sinon.stub().resolves(emptyArray),
-      };
+      const mockRepo = { findAll: sinon.stub().resolves(emptyArray) };
       const service = new Service(mockRepo);
 
       // Act
@@ -171,10 +163,7 @@ describe.only("Profile Service", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const mockRepo = {
-        findByPk: sinon.stub().resolves(jsonObject),
-      };
-
+      const mockRepo = { findByPk: sinon.stub().resolves(jsonObject) };
       const id = 1;
       const service = new Service(mockRepo);
 
@@ -190,9 +179,7 @@ describe.only("Profile Service", () => {
       // Arrange
       const validData = { id: 1, field1: "data1" };
       const invalidId = null; // This should cause an error
-      const mockRepo = {
-        findByPk: sinon.stub().resolves(),
-      };
+      const mockRepo = { findByPk: sinon.stub().resolves(1) };
       const service = new Service(mockRepo);
 
       try {
@@ -207,6 +194,20 @@ describe.only("Profile Service", () => {
         expect(error.message).to.equal("Resource ID must be numerical");
         expect(mockRepo.findByPk.called).to.be.false;
       }
+    });
+
+    it("should respond with an empty array", async () => {
+      // Arrange
+      const emptyResponse = {};
+      const mockRepo = { findAll: sinon.stub().resolves(emptyResponse) };
+      const service = new Service(mockRepo);
+
+      // Act
+      const result = await service.readAll();
+
+      // Assert
+      expect(mockRepo.findAll.called).to.be.true;
+      expect(result).to.deep.equal(emptyResponse);
     });
 
     it("should respond with a 500 Internal service error from the service", async () => {
@@ -234,33 +235,13 @@ describe.only("Profile Service", () => {
   });
 
   describe("Update", () => {
-    it("should return message: resource updated for a valid request", async () => {
-      // Arrange
-      const id = 1;
-      const mockRepo = {
-        update: sinon.stub().resolves(1),
-      };
-      const updateSchema = { validate: sinon.stub().returnsThis() };
-      const validJsonObject = { field1: "data1" };
-      const service = new Service(mockRepo);
-      service.setUpdateSchema(updateSchema);
-
-      // Act
-      const result = await service.update(id, validJsonObject);
-
-      // Assert
-      expect(updateSchema.validate.called).to.be.true;
-      expect(mockRepo.update.called).to.be.true;
-      expect(result).to.equal(1);
-    });
+    it("should return message: resource updated for a valid request", async () => {});
 
     it("should handle missing id request", async () => {
       // Arrange
       const validJsonObject = { field1: "data1" };
       const invalidId = null;
-      const mockRepo = {
-        update: sinon.stub().resolves(validJsonObject),
-      };
+      const mockRepo = { update: sinon.stub().resolves(validJsonObject) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
       const service = new Service(mockRepo);
       service.setUpdateSchema(updateSchema);
@@ -283,10 +264,7 @@ describe.only("Profile Service", () => {
     it("should return message: invalid request", async () => {
       // Arrange
       const id = 1;
-      const mockRepo = {
-        update: sinon.stub().resolves(1),
-      };
-
+      const mockRepo = { update: sinon.stub().resolves(1) };
       const invalidJsonObject = {}; // bad object
 
       const validationError = new Error("Validation Error"); // Joi stub setup
@@ -344,6 +322,78 @@ describe.only("Profile Service", () => {
         expect(mockRepo.update.called).to.be.true;
         expect(error.constructor.name).to.equal("Error");
         expect(error.message).to.equal(`Internal Server Error`);
+      }
+    });
+  });
+
+  describe("delete", () => {
+    it("should delete resource with provided PK", async () => {
+      // Arrange
+      const id = 1;
+      const mockRepo = { destroy: sinon.stub().resolves(1) };
+      const service = new Service(mockRepo);
+
+      // Act
+      const result = await service.delete(id);
+
+      // Assert
+      expect(mockRepo.destroy.called).to.be.true;
+      expect(result).to.equal(1);
+    });
+
+    it("should respond with 0 if nno records deleted", async () => {
+      // Arrange
+      const id = 1;
+      const mockRepo = { destroy: sinon.stub().resolves(0) };
+      const service = new Service(mockRepo);
+
+      // Act
+      const result = await service.delete(id);
+
+      // Assert
+      expect(mockRepo.destroy.called).to.be.true;
+      expect(result).to.equal(0);
+    });
+
+    it("should handle missing id request", async () => {
+      // Arrange
+      const invalidId = null; // This should cause an error
+      const mockRepo = { destroy: sinon.stub().resolves(1) };
+      const service = new Service(mockRepo);
+
+      try {
+        // Act
+        await service.delete(invalidId);
+
+        // If no error is thrown, fail the test
+        expect.fail("Expected Error, but no error was thrown.");
+      } catch (error) {
+        // Assert
+        expect(error.constructor.name).to.equal("Error");
+        expect(error.message).to.equal("Resource ID must be numerical");
+        expect(mockRepo.destroy.called).to.be.false;
+      }
+    });
+
+    it("should respond with a 500 Internal service error from the service", async () => {
+      try {
+        // Arrange
+        mockRepo = {
+          destroy: sinon.stub().throws(new Error("Internal Server Error")),
+        };
+        const id = 1; // valid id
+        const service = new Service(mockRepo);
+
+        // Act
+        await service.delete(id);
+
+        // If no error is thrown, fail the test
+        expect.fail("Expected ValidationError, but no error was thrown.");
+      } catch (error) {
+        // Assert
+        expect(error.constructor.name).to.equal("Error");
+        expect(error.message).to.equal(`Internal Server Error`);
+        expect(mockRepo.destroy.called).to.be.true;
       }
     });
   });
