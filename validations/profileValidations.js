@@ -25,34 +25,34 @@ const createSchema = Joi.object({
       "any.required": `email is a required field`,
       "string.base": `email should be a type of 'text'`,
     }),
-  battleTag: Joi.string().messages({
-    "string.empty": `battleTag cannot be a empty field`,
-    "string.base": `battleTag should be a type of 'text'`,
-  }),
-  discord: Joi.string().messages({
-    "string.empty": `discord cannot be a empty field`,
-    "string.base": `discord should be a type of 'text'`,
-  }),
-  twitch: Joi.string().messages({
-    "string.empty": `twitch cannot be a empty field`,
-    "string.base": `twitch should be a type of 'text'`,
-  }),
-  x: Joi.string().messages({
-    "string.empty": `twitter cannot be a empty field`,
-    "string.base": `twitter should be a type of 'text'`,
-  }),
-  youtube: Joi.string().messages({
-    "string.empty": `youtube cannot be a empty field`,
-    "string.base": `youtube should be a type of 'text'`,
-  }),
-  wowhead: Joi.string().messages({
-    "string.empty": `wowhead cannot be a empty field`,
-    "string.base": `wowhead should be a type of 'text'`,
-  }),
-  primary_language: Joi.string().messages({
-    "string.empty": `primary_language cannot be a empty field`,
-    "string.base": `primary_language should be a type of 'text'`,
-  }),
+  // battleTag: Joi.string().messages({
+  //   "string.empty": `battleTag cannot be a empty field`,
+  //   "string.base": `battleTag should be a type of 'text'`,
+  // }),
+  // discord: Joi.string().messages({
+  //   "string.empty": `discord cannot be a empty field`,
+  //   "string.base": `discord should be a type of 'text'`,
+  // }),
+  // twitch: Joi.string().messages({
+  //   "string.empty": `twitch cannot be a empty field`,
+  //   "string.base": `twitch should be a type of 'text'`,
+  // }),
+  // x: Joi.string().messages({
+  //   "string.empty": `twitter cannot be a empty field`,
+  //   "string.base": `twitter should be a type of 'text'`,
+  // }),
+  // youtube: Joi.string().messages({
+  //   "string.empty": `youtube cannot be a empty field`,
+  //   "string.base": `youtube should be a type of 'text'`,
+  // }),
+  // wowhead: Joi.string().messages({
+  //   "string.empty": `wowhead cannot be a empty field`,
+  //   "string.base": `wowhead should be a type of 'text'`,
+  // }),
+  // primary_language: Joi.string().messages({
+  //   "string.empty": `primary_language cannot be a empty field`,
+  //   "string.base": `primary_language should be a type of 'text'`,
+  // }),
   about: Joi.string().messages({
     "string.empty": `about cannot be a empty field`,
     "string.base": `about should be a type of 'text'`,
@@ -77,36 +77,36 @@ const updateSchema = Joi.object({
       "any.required": `email is a required field`,
       "string.base": `email should be a type of 'email'`,
     }),
-  battleTag: Joi.string().messages({
-    "string.empty": `battleTag cannot be a empty field`,
-    "any.required": `battleTag is a required field`,
-    "string.base": `battleTag should be a type of 'text'`,
-  }),
-  discord: Joi.string().messages({
-    "string.empty": `discord cannot be a empty field`,
-    "any.required": `discord is a required field`,
-    "string.base": `discord should be a type of 'text'`,
-  }),
-  twitch: Joi.string().messages({
-    "string.empty": `twitch cannot be a empty field`,
-    "string.base": `twitch should be a type of 'text'`,
-  }),
-  x: Joi.string().messages({
-    "string.empty": `twitter cannot be a empty field`,
-    "string.base": `twitter should be a type of 'text'`,
-  }),
-  youtube: Joi.string().messages({
-    "string.empty": `youtube cannot be a empty field`,
-    "string.base": `youtube should be a type of 'text'`,
-  }),
-  wowhead: Joi.string().messages({
-    "string.empty": `wowhead cannot be a empty field`,
-    "string.base": `wowhead should be a type of 'text'`,
-  }),
-  primary_language: Joi.string().messages({
-    "string.empty": `primary_language cannot be a empty field`,
-    "string.base": `primary_language should be a type of 'text'`,
-  }),
+  // battleTag: Joi.string().messages({
+  //   "string.empty": `battleTag cannot be a empty field`,
+  //   "any.required": `battleTag is a required field`,
+  //   "string.base": `battleTag should be a type of 'text'`,
+  // }),
+  // discord: Joi.string().messages({
+  //   "string.empty": `discord cannot be a empty field`,
+  //   "any.required": `discord is a required field`,
+  //   "string.base": `discord should be a type of 'text'`,
+  // }),
+  // twitch: Joi.string().messages({
+  //   "string.empty": `twitch cannot be a empty field`,
+  //   "string.base": `twitch should be a type of 'text'`,
+  // }),
+  // x: Joi.string().messages({
+  //   "string.empty": `twitter cannot be a empty field`,
+  //   "string.base": `twitter should be a type of 'text'`,
+  // }),
+  // youtube: Joi.string().messages({
+  //   "string.empty": `youtube cannot be a empty field`,
+  //   "string.base": `youtube should be a type of 'text'`,
+  // }),
+  // wowhead: Joi.string().messages({
+  //   "string.empty": `wowhead cannot be a empty field`,
+  //   "string.base": `wowhead should be a type of 'text'`,
+  // }),
+  // primary_language: Joi.string().messages({
+  //   "string.empty": `primary_language cannot be a empty field`,
+  //   "string.base": `primary_language should be a type of 'text'`,
+  // }),
   about: Joi.string().messages({
     "string.empty": `about cannot be a empty field`,
     "string.base": `about should be a type of 'text'`,
