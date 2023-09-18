@@ -5,6 +5,8 @@ const sinon = require("sinon");
 const Service = require("../../services/profileService");
 
 describe("Profile Service", () => {
+  let service;
+
   const jsonObjectArray = [
     {
       id: 1,
@@ -25,13 +27,14 @@ describe("Profile Service", () => {
       updatedAt: new Date(),
     },
   ];
+
   describe("Create", () => {
     it("should return message: created resource for a valid request", async () => {
       // Arrange
-      const mockRepo = { create: sinon.stub().resolves(1) };
       const validJsonObject = { field1: "data1" };
+      const mockRepo = { create: sinon.stub().resolves(1) };
       const createSchema = { validate: sinon.stub().returnsThis() };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setCreateSchema(createSchema);
 
       // Act
@@ -61,7 +64,7 @@ describe("Profile Service", () => {
       ];
 
       const createSchema = { validate: sinon.stub().throws(validationError) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setCreateSchema(createSchema);
 
       try {
@@ -86,7 +89,7 @@ describe("Profile Service", () => {
       };
       const validJsonObject = { field1: "data1" };
       const createSchema = { validate: sinon.stub().returnsThis() };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setCreateSchema(createSchema);
 
       try {
@@ -109,7 +112,7 @@ describe("Profile Service", () => {
     it("should respond with an array of objects", async () => {
       // Arrange
       const mockRepo = { findAll: sinon.stub().resolves(jsonObjectArray) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.readAll();
@@ -123,7 +126,7 @@ describe("Profile Service", () => {
       // Arrange
       const emptyArray = [];
       const mockRepo = { findAll: sinon.stub().resolves(emptyArray) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.readAll();
@@ -138,7 +141,7 @@ describe("Profile Service", () => {
       const mockRepo = {
         findAll: sinon.stub().throws(new Error("Internal Server Error")),
       };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       try {
         // Act
@@ -166,7 +169,7 @@ describe("Profile Service", () => {
       };
       const mockRepo = { findByPk: sinon.stub().resolves(jsonObject) };
       const id = 1;
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.readOne(id);
@@ -181,7 +184,7 @@ describe("Profile Service", () => {
       const validData = { id: 1, field1: "data1" };
       const invalidId = null; // This should cause an error
       const mockRepo = { findByPk: sinon.stub().resolves(1) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       try {
         // Act
@@ -201,7 +204,7 @@ describe("Profile Service", () => {
       // Arrange
       const emptyResponse = {};
       const mockRepo = { findAll: sinon.stub().resolves(emptyResponse) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.readAll();
@@ -218,7 +221,7 @@ describe("Profile Service", () => {
         findByPk: sinon.stub().throws(new Error("Internal Server Error")),
       };
 
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       try {
         // Act
@@ -244,7 +247,7 @@ describe("Profile Service", () => {
       const invalidId = null;
       const mockRepo = { update: sinon.stub().resolves(validJsonObject) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -281,7 +284,7 @@ describe("Profile Service", () => {
       ];
 
       const updateSchema = { validate: sinon.stub().throws(validationError) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -308,7 +311,7 @@ describe("Profile Service", () => {
       };
 
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -332,7 +335,7 @@ describe("Profile Service", () => {
       // Arrange
       const id = 1;
       const mockRepo = { destroy: sinon.stub().resolves(1) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.delete(id);
@@ -346,7 +349,7 @@ describe("Profile Service", () => {
       // Arrange
       const id = 1;
       const mockRepo = { destroy: sinon.stub().resolves(0) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       // Act
       const result = await service.delete(id);
@@ -360,7 +363,7 @@ describe("Profile Service", () => {
       // Arrange
       const invalidId = null; // This should cause an error
       const mockRepo = { destroy: sinon.stub().resolves(1) };
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       try {
         // Act
@@ -382,7 +385,7 @@ describe("Profile Service", () => {
         destroy: sinon.stub().throws(new Error("Internal Server Error")),
       };
       const id = 1; // valid id
-      const service = new Service(mockRepo);
+      service = new Service(mockRepo);
 
       try {
         // Act
