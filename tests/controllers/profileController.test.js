@@ -12,6 +12,7 @@ const app = express();
 
 const mockService = {
   create: sinon.stub(),
+  readAll: sinon.stub(),
 };
 
 describe.only("Profile Controller", () => {
@@ -94,6 +95,82 @@ describe.only("Profile Controller", () => {
 
       // Assert
       expect(mockService.create.calledOnce).to.be.true;
+      expect(response.status).to.equal(500);
+      expect(response.body).to.deep.equal({
+        message: "Internal Server Error",
+      });
+    });
+  });
+
+  describe("GET /api/v1/profiles", () => {
+    it("Should respond with an array of objects", async () => {
+      // Arrange
+      const jsonObject = [
+        {
+          field1: "data1",
+        },
+      ];
+
+      mockService.readAll.resolves(jsonObject);
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .get("/api/v1/profiles/")
+        .send(jsonObject)
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.readAll.calledOnce).to.be.true;
+      expect(response.status).to.equal(200);
+      expect(response.body).to.deep.equal(jsonObject);
+    });
+
+    it("Should respond with an empty array", async () => {
+      // Arrange
+      const jsonObject = [];
+
+      mockService.readAll.resolves(jsonObject);
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .get("/api/v1/profiles/")
+        .send(jsonObject)
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.readAll.calledOnce).to.be.true;
+      expect(response.status).to.equal(200);
+      expect(response.body).to.deep.equal(jsonObject);
+    });
+
+    it("Should respond with 500 internal server error from service", async () => {
+      // Arrange
+      const jsonObject = {
+        field1: "data1",
+      };
+
+      mockService.readAll.throws(new Error("Internal Server Error"));
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .get("/api/v1/profiles/")
+        .send(jsonObject)
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.readAll.calledOnce).to.be.true;
       expect(response.status).to.equal(500);
       expect(response.body).to.deep.equal({
         message: "Internal Server Error",
