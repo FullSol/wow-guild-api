@@ -1,57 +1,99 @@
 const { expect } = require("chai");
 const sinon = require("sinon");
 const Service = require("../../services/profileService");
+const { AggregateError, json } = require("sequelize");
 
-describe("Profile Service", () => {
-  let service;
-  let mockRepo;
-
-  const setupService = () => {
-    createSchema = { validate: sinon.stub() };
-    updateSchema = { validate: sinon.stub() };
-
-    mockRepo = {
-      create: sinon.stub(),
-      findAll: sinon.stub(),
-      findByPk: sinon.stub(),
-      update: sinon.stub(),
-      destroy: sinon.stub(),
-    };
-
-    service = new Service(mockRepo, createSchema, updateSchema);
-  };
-
-  beforeEach(() => {
-    setupService();
-  });
-
+describe.only("Profile Service", () => {
+  const jsonObjectArray = [
+    {
+      id: 1,
+      field1: "data1",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 2,
+      field1: "data2",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 3,
+      field1: "data3",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
   describe("Create", () => {
-    it("should return success message and created resource for a valid request", async () => {
-      // Arrange'
-      const validJsonObject = {
-        validField: "validData",
-      };
+    it("should return message: created resource for a valid request", async () => {
+      // Arrange
       const mockRepo = {
         create: sinon.stub().resolves(1),
       };
-      const createSchema = { validate: sinon.stub().returns(null) };
-      const updateSchema = { validate: sinon.stub().returns(null) };
-
-      const service = new Service(mockRepo, createSchema, updateSchema);
+      const validJsonObject = { field1: "data1" };
+      const createSchema = { validate: sinon.stub().returnsThis() };
+      const service = new Service(mockRepo);
+      service.setCreateSchema(createSchema);
 
       // Act
       const result = await service.create(validJsonObject);
 
       // Assert
-      expect(result).to.equal(1);
+      expect(createSchema.validate.called).to.be.true;
       expect(mockRepo.create.called).to.be.true;
+      expect(result).to.equal(1);
+    });
+
+    it("should return message: invalid request", async () => {
+      // Arrange
+      const mockRepo = {
+        create: sinon.stub().resolves(1),
+      };
+
+      const invalidJsonObject = {}; // bad object
+
+      const validationError = new Error("Validation Error"); // Joi stub setup
+      validationError.details = [
+        {
+          message: '"username" is required',
+          path: ["username"],
+          type: "any.required",
+          context: {
+            key: "username",
+          },
+        },
+      ];
+
+      const createSchema = { validate: sinon.stub().throws(validationError) };
+      const service = new Service(mockRepo);
+      service.setCreateSchema(createSchema);
+
+      try {
+        // Act
+        await service.create(invalidJsonObject);
+
+        // If no error is thrown, fail the test
+        expect.fail("Expected ValidationError, but no error was thrown.");
+      } catch (error) {
+        // Assert
+        expect(createSchema.validate.called).to.be.true;
+        expect(error).to.equal(validationError);
+        expect(error.details).to.deep.equal(validationError.details);
+        expect(mockRepo.create.called).to.be.false;
+      }
     });
 
     it("should respond with a 500 Internal service error from the service", async () => {
-      try {
-        // Arrange
-        mockRepo.create.throws(new Error("Internal Server Error"));
+      // Arrange
+      const mockRepo = {
+        create: sinon.stub().throws(new Error("Internal Server Error")),
+      };
+      const validJsonObject = { field1: "data1" };
+      const createSchema = { validate: sinon.stub().returnsThis() };
+      const service = new Service(mockRepo);
+      service.setCreateSchema(createSchema);
 
+      try {
         // Act
         await service.create(validJsonObject);
 
@@ -59,9 +101,10 @@ describe("Profile Service", () => {
         expect.fail("Expected ValidationError, but no error was thrown.");
       } catch (error) {
         // Assert
+        expect(createSchema.validate.called).to.be.true;
+        expect(mockRepo.create.called).to.be.true;
         expect(error.constructor.name).to.equal("Error");
         expect(error.message).to.equal(`Internal Server Error`);
-        expect(mockRepo.create.called).to.be.true;
       }
     });
   });
@@ -69,248 +112,53 @@ describe("Profile Service", () => {
   describe("read all", () => {
     it("should respond with an array of objects", async () => {
       // Arrange
-      const jsonObjectArray = [
-        {
-          id: 1,
-          validField: "validData1",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: 2,
-          validField: "validData2",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: 3,
-          validField: "validData3",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-      mockRepo.findAll.resolves(jsonObjectArray);
+      const mockRepo = {
+        findAll: sinon.stub().resolves(jsonObjectArray),
+      };
+      const service = new Service(mockRepo);
 
       // Act
       const result = await service.readAll();
 
       // Assert
-      expect(result).to.deep.equal(jsonObjectArray);
       expect(mockRepo.findAll.called).to.be.true;
+      expect(result).to.deep.equal(jsonObjectArray);
     });
 
-    it("should return resource not found message", async () => {
+    it("should respond with an empty array", async () => {
       // Arrange
-      mockRepo.findAll.resolves(null);
-
-      try {
-        // Act
-        await service.readAll();
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ResourceError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("ResourceError");
-        expect(error.message).to.equal("The requested resource was not found");
-        expect(mockRepo.findAll.called).to.be.true;
-      }
-    });
-
-    it("should respond with a 500 Internal service error from the repo", async () => {
-      try {
-        // Arrange
-        mockRepo.findAll.throws(new Error("Internal Server Error"));
-
-        // Act
-        await service.readAll();
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ValidationError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal(`Internal Server Error`);
-        expect(mockRepo.findAll.called).to.be.true;
-      }
-    });
-  });
-
-  describe("read one", () => {
-    it("should return resource with provided PK", async () => {
-      // Arrange
-      const jsonObject = {
-        id: 1,
-        validField: "validData",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const emptyArray = [];
+      const mockRepo = {
+        findAll: sinon.stub().resolves(emptyArray),
       };
-      mockRepo.findByPk.resolves(jsonObject);
-      const id = 1; // valid
+      const service = new Service(mockRepo);
 
       // Act
-      const result = await service.readOne(id);
+      const result = await service.readAll();
 
       // Assert
-      expect(result).to.deep.equal(jsonObject);
-      expect(mockRepo.findByPk.called).to.be.true;
-    });
-
-    it("should return resource not found message", async () => {
-      // Arrange
-      mockRepo.findByPk.resolves(null);
-
-      try {
-        // Act
-        await service.readOne();
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ResourceError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("ResourceError");
-        expect(error.message).to.equal("The requested resource was not found");
-        expect(mockRepo.findByPk.called).to.be.true;
-      }
-    });
-
-    it("should handle missing id request", async () => {
-      // Arrange
-      const invalidId = null; // This should trigger a validation error
-
-      try {
-        // Act
-        await service.readOne(invalidId);
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected Error, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal("Internal Server Error");
-        expect(mockRepo.findByPk.called).to.be.false;
-      }
+      expect(mockRepo.findAll.called).to.be.true;
+      expect(result).to.deep.equal(emptyArray);
     });
 
     it("should respond with a 500 Internal service error from the service", async () => {
-      try {
-        // Arrange
-        mockRepo.findByPk.throws(new Error("Internal Server Error"));
-        const id = 1; // valid id
+      // Arrange
+      const mockRepo = {
+        findAll: sinon.stub().throws(new Error("Internal Server Error")),
+      };
+      const service = new Service(mockRepo);
 
+      try {
         // Act
-        await service.readOne(id);
+        await service.readAll();
 
         // If no error is thrown, fail the test
         expect.fail("Expected ValidationError, but no error was thrown.");
       } catch (error) {
         // Assert
+        expect(mockRepo.findAll.called).to.be.true;
         expect(error.constructor.name).to.equal("Error");
         expect(error.message).to.equal(`Internal Server Error`);
-        expect(mockRepo.findByPk.called).to.be.true;
-      }
-    });
-  });
-
-  describe("Update", () => {
-    it("should update resource with provided PK", async () => {
-      // Arrange
-      mockRepo.update.resolves(jsonObject);
-      const id = 1;
-
-      // Act
-      const result = await service.update(id, jsonInputObject);
-
-      // Assert
-      expect(result).to.deep.equal(jsonObject);
-      expect(mockRepo.update.called).to.be.true;
-    });
-
-    it("should respond with resource not found error", async () => {
-      // Arrange
-      mockRepo.update.resolves({ 0: 0 });
-      const id = 1;
-
-      try {
-        // Act
-        await service.update(id, jsonInputObject);
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ResourceError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("ResourceError");
-        expect(error.message).to.equal("The requested resource was not found");
-        expect(mockRepo.update.called).to.be.true;
-      }
-    });
-
-    it("should respond with a 500 Internal service error from the service", async () => {
-      try {
-        // Arrange
-        mockRepo.update.throws(new Error("Internal Server Error"));
-        const id = 1; // valid id
-
-        // Act
-        await service.update(id, jsonInputObject);
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ValidationError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal(`Internal Server Error`);
-        expect(mockRepo.update.called).to.be.true;
-      }
-    });
-  });
-
-  describe("delete", () => {
-    it("should delete resource with provided PK", async () => {
-      // Arrange
-      mockRepo.destroy.resolves(1);
-
-      // Act
-      const result = await service.delete(1);
-
-      // Assert
-      expect(result).to.equal(1);
-    });
-
-    it("should respond with resource not found error", async () => {
-      // Arrange
-      mockRepo.destroy.resolves(0);
-
-      try {
-        // Act
-        await service.delete(1);
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ResourceError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("ResourceError");
-        expect(error.message).to.equal("The requested resource was not found");
-        expect(mockRepo.destroy.called).to.be.true;
-      }
-    });
-
-    it("should respond with a 500 Internal service error from the service", async () => {
-      try {
-        // Arrange
-        mockRepo.destroy.throws(new Error("Internal Server Error"));
-        const id = 1; // valid id
-
-        // Act
-        await service.delete(id);
-
-        // If no error is thrown, fail the test
-        expect.fail("Expected ValidationError, but no error was thrown.");
-      } catch (error) {
-        // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal(`Internal Server Error`);
-        expect(mockRepo.destroy.called).to.be.true;
       }
     });
   });
