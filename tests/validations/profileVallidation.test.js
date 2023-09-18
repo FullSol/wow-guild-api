@@ -51,6 +51,7 @@ describe("Profile Validations", () => {
     });
 
     it("should not validate an invalid type create Schema object", () => {
+      // Arrange
       const invalidData = {
         username: true,
         password: true,
@@ -66,8 +67,10 @@ describe("Profile Validations", () => {
         about: true,
       };
 
+      // Act
       const result = createSchema.validate(invalidData);
 
+      // Assert
       expect(result.error).to.exist;
       result.error.details.forEach((detail) => {
         expect(detail.type).to.equal("string.base");
