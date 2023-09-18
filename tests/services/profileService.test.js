@@ -1,9 +1,10 @@
 "use strict";
+
 const { expect } = require("chai");
 const sinon = require("sinon");
 const Service = require("../../services/profileService");
 
-describe.only("Profile Service", () => {
+describe("Profile Service", () => {
   const jsonObjectArray = [
     {
       id: 1,
