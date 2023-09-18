@@ -10,13 +10,6 @@ class AggregateValidationError extends AggregateError {
   }
 }
 
-class ResourceError extends Error {
-  constructor(arg1) {
-    super(arg1);
-    this.name = "ResourceError";
-  }
-}
-
 const createErrorsArray = (error) => {
   try {
     const message = [];
