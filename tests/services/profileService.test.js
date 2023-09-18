@@ -1,3 +1,4 @@
+"use strict";
 const { expect } = require("chai");
 const sinon = require("sinon");
 const Service = require("../../services/profileService");
@@ -44,7 +45,6 @@ describe.only("Profile Service", () => {
     it("should return message: invalid request", async () => {
       // Arrange
       const mockRepo = { create: sinon.stub().resolves(1) };
-
       const invalidJsonObject = {}; // bad object
 
       const validationError = new Error("Validation Error"); // Joi stub setup
@@ -376,14 +376,14 @@ describe.only("Profile Service", () => {
     });
 
     it("should respond with a 500 Internal service error from the service", async () => {
-      try {
-        // Arrange
-        mockRepo = {
-          destroy: sinon.stub().throws(new Error("Internal Server Error")),
-        };
-        const id = 1; // valid id
-        const service = new Service(mockRepo);
+      // Arrange
+      const mockRepo = {
+        destroy: sinon.stub().throws(new Error("Internal Server Error")),
+      };
+      const id = 1; // valid id
+      const service = new Service(mockRepo);
 
+      try {
         // Act
         await service.delete(id);
 
