@@ -67,6 +67,7 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   };
