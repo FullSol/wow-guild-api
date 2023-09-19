@@ -55,7 +55,9 @@ class ProfileService {
       if (result <= 1) console.log("user found");
       else console.log("no user found");
     } catch (error) {
+      logger.info("profile service: authenticate");
       logger.error(error.message);
+      throw error;
     }
   };
 
@@ -97,21 +99,28 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      console.log(error);
+      logger.info("profile service: read all");
+      logger.error(error.message);
       throw error;
     }
   };
 
   readOne = async (id) => {
-    // Check for valid id
-    if (id === null || isNaN(id))
-      throw new Error("Resource ID must be numerical");
+    try {
+      // Check for valid id
+      if (id === null || isNaN(id))
+        throw new Error("Resource ID must be numerical");
 
-    // Attempt to retrieve information from the DB
-    const result = this.Repo.findByPk(id);
+      // Attempt to retrieve information from the DB
+      const result = this.Repo.findByPk(id);
 
-    // Return the results
-    return result;
+      // Return the results
+      return result;
+    } catch (error) {
+      logger.info("profile service: read one");
+      logger.error(error.message);
+      throw error;
+    }
   };
 
   update = async (id, resourceData) => {
@@ -136,6 +145,8 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
+      logger.info("profile service: update");
+      logger.error(error.message);
       throw error;
     }
   };
@@ -152,6 +163,8 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
+      logger.info("profile service: delete");
+      logger.error(error.message);
       throw error;
     }
   };
