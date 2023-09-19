@@ -276,6 +276,27 @@ describe("Profile Controller", () => {
       expect(response.status).to.equal(500);
     });
 
+    it("Should respond with a ResourceNotFoundError", async () => {
+      // Arrange
+      mockService.readOne.resolves(0);
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/1")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.readOne.calledOnce).to.be.true;
+      expect(response.status).to.equal(404);
+      expect(response.body).to.deep.equal({
+        message: "Resource not found",
+      });
+    });
+
     it("Should respond with an empty array", async () => {
       // Arrange
       const jsonObject = [];
@@ -383,6 +404,27 @@ describe("Profile Controller", () => {
       expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
     });
 
+    it("Should respond with a ResourceNotFoundError", async () => {
+      // Arrange
+      mockService.update.resolves(0);
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/1")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.update.calledOnce).to.be.true;
+      expect(response.status).to.equal(404);
+      expect(response.body).to.deep.equal({
+        message: "Resource not found",
+      });
+    });
+
     it("should respond with internal server error due to invalid id", async () => {
       // Arrange
       const jsonObject = {
@@ -471,7 +513,7 @@ describe("Profile Controller", () => {
       expect(response.status).to.equal(500);
     });
 
-    it("Should respond with a no deletion message", async () => {
+    it("Should respond with a ResourceNotFoundError", async () => {
       // Arrange
       mockService.destroy.resolves(0);
 
@@ -488,7 +530,7 @@ describe("Profile Controller", () => {
       expect(mockService.destroy.calledOnce).to.be.true;
       expect(response.status).to.equal(404);
       expect(response.body).to.deep.equal({
-        message: "no resource found for deletion.",
+        message: "Resource not found",
       });
     });
 
