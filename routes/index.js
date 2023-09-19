@@ -1,4 +1,5 @@
 "use strict";
+
 // Models
 const { Profile } = require("../models");
 
