@@ -31,7 +31,7 @@ describe("Profile Service", () => {
   describe("Create", () => {
     it("should return message: created resource for a valid request", async () => {
       // Arrange
-      const validJsonObject = { field1: "data1" };
+      const validJsonObject = { username: "testUser", password: "password" };
       const mockRepo = { create: sinon.stub().resolves(1) };
       const createSchema = { validate: sinon.stub().returnsThis() };
       service = new Service(mockRepo);
@@ -87,7 +87,7 @@ describe("Profile Service", () => {
       const mockRepo = {
         create: sinon.stub().throws(new Error("Internal Server Error")),
       };
-      const validJsonObject = { field1: "data1" };
+      const validJsonObject = { username: "testUser", password: "password" };
       const createSchema = { validate: sinon.stub().returnsThis() };
       service = new Service(mockRepo);
       service.setCreateSchema(createSchema);
