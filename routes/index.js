@@ -1,17 +1,21 @@
 "use strict";
-// models
+
+// Models
 const { Profile } = require("../models");
 
-// Index
-const indexController = require("../controllers/index");
+// Services
+const { ProfileService } = require("../services/");
 
-// Profiles
-const ProfileService = require("../services/profileService");
+// Instantiate services with their models as dependency injection
 const profileService = new ProfileService(Profile);
+
+// Provide controller's service
 const profileController = require("../controllers/profileController")(
   profileService
 );
+const indexController = require("../controllers/index");
 
+// Set routes for the application
 module.exports = (app) => {
   app.use("/", indexController);
   app.use("/api/v1/", indexController);
