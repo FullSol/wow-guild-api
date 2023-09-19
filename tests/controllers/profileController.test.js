@@ -8,6 +8,10 @@ const Controller = require("../../controllers/profileController");
 const {
   AggregateValidationError,
 } = require("../../errors/custom/AggregateValidationError");
+const {
+  SequelizeUniqueConstraintError,
+} = require("../../errors/custom/SequelizeUniqueConstraintError");
+
 const app = express();
 
 const mockService = {
@@ -58,7 +62,7 @@ describe("Profile Controller", () => {
           },
         },
       ];
-      const message = "Validation Error";
+      const message = "Unable to process request due to validation failure";
 
       mockService.create.throws(new AggregateValidationError(errors, message));
 
@@ -74,7 +78,50 @@ describe("Profile Controller", () => {
       expect(mockService.create.calledOnce).to.be.true;
       expect(response.status).to.equal(400);
       expect(response.body.status).to.equal("error");
-      expect(response.body.message).to.equal("Validation failed");
+      expect(response.body.message).to.equal(message);
+      expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
+    });
+
+    it("should respond with a unique constraint error", async () => {
+      // Arrange
+      const duplicateObject = {
+        username: "testUser",
+      }; // bad object
+      const errors = [
+        {
+          ValidationErrorItem: {
+            message: "username must be unique",
+            type: "unique violation",
+            path: "username",
+            value: "testUser",
+            origin: "DB",
+            instance: ["Profile"],
+            validatorKey: "not_unique",
+            validatorName: null,
+            validatorArgs: [],
+          },
+        },
+      ];
+
+      const message = "Unable to process request due to duplicate entry";
+
+      mockService.create.throws(
+        new SequelizeUniqueConstraintError(errors, message)
+      );
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      const response = await supertest(app)
+        .post("/api/v1/profiles")
+        .send(duplicateObject)
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.create.calledOnce).to.be.true;
+      expect(response.status).to.equal(422);
+      expect(response.body.status).to.equal("Unique Constraint Error");
+      expect(response.body.message).to.equal(message);
       expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
     });
 
@@ -316,7 +363,7 @@ describe("Profile Controller", () => {
           },
         },
       ];
-      const message = "Validation Error";
+      const message = "Unable to process request due to validation failure";
 
       mockService.update.throws(new AggregateValidationError(errors, message));
 
@@ -332,7 +379,7 @@ describe("Profile Controller", () => {
       expect(mockService.update.calledOnce).to.be.true;
       expect(response.status).to.equal(400);
       expect(response.body.status).to.equal("error");
-      expect(response.body.message).to.equal("Validation failed");
+      expect(response.body.message).to.equal(message);
       expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
     });
 
