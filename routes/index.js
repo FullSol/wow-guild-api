@@ -13,7 +13,9 @@ const indexController = require("../controllers/index");
 const profileController = require("../controllers/profileController")(
   profileService
 );
+const indexController = require("../controllers/index");
 
+// Set routes for the application
 module.exports = (app) => {
   app.use("/", indexController);
   app.use("/api/v1/", indexController);
