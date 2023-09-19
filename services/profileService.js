@@ -11,10 +11,8 @@ const { Op, Sequelize } = require("sequelize");
 
 const {
   AggregateValidationError,
-} = require("../errors/custom/AggregateValidationError");
-const {
   SequelizeUniqueConstraintError,
-} = require("../errors/custom/SequelizeUniqueConstraintError");
+} = require("../errors/custom");
 
 const createErrorsArray = (error) => {
   try {
@@ -90,8 +88,12 @@ class ProfileService {
     } catch (error) {
       logger.info("profile service: create");
       logger.error(error.message);
-      if (error.name === "SequelizeUniqueConstraintError")
+      if (error.name === "SequelizeUniqueConstraintError") {
+        delete error.errors[0].instance.password;
+        error.errors[0].instance.password = undefined;
         throw new SequelizeUniqueConstraintError(error.errors, error.message);
+      }
+
       throw error;
     }
   };
