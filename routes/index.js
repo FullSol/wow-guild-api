@@ -1,13 +1,15 @@
 "use strict";
-// models
+// Import Models
 const { Profile } = require("../models");
 
-// Index
-const indexController = require("../controllers/index");
+// Import Services
+const { ProfileService } = require("../services");
 
-// Profiles
-const ProfileService = require("../services/profileService");
+// Instantiate services with their models
 const profileService = new ProfileService(Profile);
+
+// Import controllers
+const indexController = require("../controllers/index");
 const profileController = require("../controllers/profileController")(
   profileService
 );
