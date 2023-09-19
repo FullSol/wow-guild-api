@@ -181,7 +181,6 @@ describe("Profile Service", () => {
 
     it("should handle missing id request", async () => {
       // Arrange
-      const validData = { id: 1, field1: "data1" };
       const invalidId = null; // This should cause an error
       const mockRepo = { findByPk: sinon.stub().resolves(1) };
       service = new ProfileService(mockRepo);
@@ -200,18 +199,23 @@ describe("Profile Service", () => {
       }
     });
 
-    it("should respond with an empty array", async () => {
+    it("should respond with ResourceNotFoundError", async () => {
       // Arrange
-      const emptyResponse = {};
-      const mockRepo = { findAll: sinon.stub().resolves(emptyResponse) };
+      const id = 1;
+      const mockRepo = { findByPk: sinon.stub().resolves(null) };
       service = new ProfileService(mockRepo);
 
-      // Act
-      const result = await service.readAll();
+      try {
+        // Act
+        const result = await service.readOne(id);
 
-      // Assert
-      expect(mockRepo.findAll.called).to.be.true;
-      expect(result).to.deep.equal(emptyResponse);
+        // Assert
+        expect(result).to.deep.equal(null);
+      } catch (error) {
+        // Assert
+        expect(mockRepo.findByPk.called).to.be.true;
+        expect(error.name).of.equal("ResourceNotFoundError");
+      }
     });
 
     it("should respond with a 500 Internal service error from the service", async () => {
@@ -262,6 +266,29 @@ describe("Profile Service", () => {
         expect(error.message).to.equal("Resource ID must be numerical");
         expect(updateSchema.validate.called).to.be.false;
         expect(mockRepo.update.called).to.be.false;
+      }
+    });
+
+    it("should respond with ResourceNotFoundError", async () => {
+      // Arrange
+      const id = 1;
+      const validData = { field1: "data1" };
+      const mockRepo = { update: sinon.stub().resolves({ 0: 0 }) };
+      const updateSchema = { validate: sinon.stub().returnsThis() };
+      service = new ProfileService(mockRepo);
+      service.setUpdateSchema(updateSchema);
+
+      try {
+        // Act
+        const result = await service.update(id, validData);
+
+        // Assert
+        expect(result).to.deep.equal(null);
+      } catch (error) {
+        console.log(error);
+        // Assert
+        expect(mockRepo.update.called).to.be.true;
+        expect(error.name).to.equal("ResourceNotFoundError");
       }
     });
 

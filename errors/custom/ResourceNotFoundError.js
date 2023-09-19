@@ -1,8 +1,8 @@
 "use strict";
-class ResourceNoFoundError extends Error {
+class ResourceNotFoundError extends Error {
   constructor(arg1) {
     super(arg1);
     this.name = "ResourceNotFoundError";
   }
 }
-exports.ResourceNoFoundError = ResourceNoFoundError;
+exports.ResourceNotFoundError = ResourceNotFoundError;

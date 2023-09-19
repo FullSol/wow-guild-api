@@ -2,10 +2,10 @@ const { AggregateValidationError } = require("./AggregateValidationError");
 const {
   SequelizeUniqueConstraintError,
 } = require("./SequelizeUniqueConstraintError");
-const { ResourceNoFoundError } = require("./ResourceNotFoundError");
+const { ResourceNotFoundError } = require("./ResourceNotFoundError");
 
 module.exports = {
   AggregateValidationError,
   SequelizeUniqueConstraintError,
-  ResourceNoFoundError,
+  ResourceNotFoundError,
 };
