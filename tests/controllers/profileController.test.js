@@ -11,6 +11,7 @@ const {
 const {
   SequelizeUniqueConstraintError,
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
+const { ResourceNotFoundError } = require("../../errors/custom");
 
 const app = express();
 
@@ -278,13 +279,15 @@ describe("Profile Controller", () => {
 
     it("Should respond with a ResourceNotFoundError", async () => {
       // Arrange
-      mockService.readOne.resolves(0);
+      mockService.readOne.throws(
+        new ResourceNotFoundError("Resource not found")
+      );
 
       app.use("/api/v1/profiles", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/1")
+        .get("/api/v1/profiles/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
@@ -293,6 +296,7 @@ describe("Profile Controller", () => {
       expect(mockService.readOne.calledOnce).to.be.true;
       expect(response.status).to.equal(404);
       expect(response.body).to.deep.equal({
+        status: "ResourceNotFoundError",
         message: "Resource not found",
       });
     });
@@ -406,13 +410,15 @@ describe("Profile Controller", () => {
 
     it("Should respond with a ResourceNotFoundError", async () => {
       // Arrange
-      mockService.update.resolves(0);
+      mockService.update.throws(
+        new ResourceNotFoundError("Resource not found")
+      );
 
       app.use("/api/v1/profiles", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/1")
+        .patch("/api/v1/profiles/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
@@ -421,6 +427,7 @@ describe("Profile Controller", () => {
       expect(mockService.update.calledOnce).to.be.true;
       expect(response.status).to.equal(404);
       expect(response.body).to.deep.equal({
+        status: "ResourceNotFoundError",
         message: "Resource not found",
       });
     });
@@ -515,7 +522,9 @@ describe("Profile Controller", () => {
 
     it("Should respond with a ResourceNotFoundError", async () => {
       // Arrange
-      mockService.destroy.resolves(0);
+      mockService.destroy.throws(
+        new ResourceNotFoundError("Resource not found")
+      );
 
       app.use("/api/v1/profiles", Controller(mockService));
 
@@ -530,6 +539,7 @@ describe("Profile Controller", () => {
       expect(mockService.destroy.calledOnce).to.be.true;
       expect(response.status).to.equal(404);
       expect(response.body).to.deep.equal({
+        status: "ResourceNotFoundError",
         message: "Resource not found",
       });
     });

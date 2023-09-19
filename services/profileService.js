@@ -12,6 +12,7 @@ const { Op, Sequelize } = require("sequelize");
 const {
   AggregateValidationError,
   SequelizeUniqueConstraintError,
+  ResourceNotFoundError,
 } = require("../errors/custom");
 
 const createErrorsArray = (error) => {
@@ -119,8 +120,9 @@ class ProfileService {
         throw new Error("Resource ID must be numerical");
 
       // Attempt to retrieve information from the DB
-      const result = this.Repo.findByPk(id);
-
+      const result = await this.Repo.findByPk(id);
+      if (result === null)
+        throw new ResourceNotFoundError("Resource not found");
       // Return the results
       return result;
     } catch (error) {
@@ -147,7 +149,14 @@ class ProfileService {
         );
 
       // Attempt to update information in the DB
-      const result = this.Repo.update({ resourceData, where: { id: id } });
+      const result = await this.Repo.update(resourceData, {
+        where: {
+          id: id,
+        },
+      });
+
+      if (result[0] === 0)
+        throw new ResourceNotFoundError("Resource not found");
 
       // Return the results
       return result;

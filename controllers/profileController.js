@@ -6,7 +6,6 @@ const logger = require("../log/logger");
 
 module.exports = (service) => {
   const errorHandler = (req, res, error) => {
-    console.log(error.name);
     const { errors } = error;
     switch (error.name) {
       case "ValidationError":
@@ -21,6 +20,12 @@ module.exports = (service) => {
           status: "Unique Constraint Error",
           message: error.message,
           data: { errors },
+        });
+        break;
+      case "ResourceNotFoundError":
+        res.status(404).send({
+          status: "ResourceNotFoundError",
+          message: error.message,
         });
         break;
       default:
@@ -58,8 +63,10 @@ module.exports = (service) => {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
       const result = await service.readOne(id);
+      console.log(result);
       res.status(200).json(result);
     } catch (error) {
+      console.log("I SHOULD BE HERE");
       logger.info("profile controller: get one");
       logger.error(error.message);
       errorHandler(req, res, error);
@@ -71,6 +78,7 @@ module.exports = (service) => {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
       const result = await service.update(id, req.body);
+      console.log(result);
       res.status(200).json(result);
     } catch (error) {
       logger.info("profile controller: patch");
