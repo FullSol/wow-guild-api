@@ -1,9 +1,13 @@
 "use strict";
 
+const bcrypt = require("bcrypt");
+const logger = require("../log/logger");
+const saltRounds = 10; // Number of salt rounds for hashing
 const {
   createSchema,
   updateSchema,
 } = require("../validations/profileValidations");
+const { Op, Sequelize } = require("sequelize");
 
 const {
   AggregateValidationError,
@@ -37,24 +41,50 @@ class ProfileService {
     this.updateSchema = updateSchema;
   };
 
+  authenticate = async (user) => {
+    try {
+      const { username, password } = user;
+      const result = await this.Repo.findAll({
+        where: {
+          username: username,
+          password: {
+            [Op.eq]: Sequelize.literal(`'${password}'`),
+          },
+        },
+      });
+      if (result <= 1) console.log("user found");
+      else console.log("no user found");
+    } catch (error) {
+      logger.error(error.message);
+    }
+  };
+
   create = async (resourceData) => {
     try {
-      // validate the incoming data
+      // Validate the incoming data
       const { error } = this.createSchema.validate(resourceData);
 
-      // If there was a validation error throw a ew validation error with error message
-      if (error)
+      if (error) {
         throw new AggregateValidationError(
           createErrorsArray(error),
           "Unable to validate the submitted resource"
         );
+      }
+
+      // Hash the password
+      const hash = await bcrypt.hash(resourceData.password, saltRounds);
+
+      // Update the resourceData with the hashed password
+      resourceData.password = hash;
 
       // Attempt to insert the new object
-      const result = this.Repo.create(resourceData);
+      const result = await this.Repo.create(resourceData);
 
       // Return the results
       return result;
     } catch (error) {
+      logger.info("profile service: create");
+      logger.error(error.message);
       throw error;
     }
   };
