@@ -6,12 +6,20 @@ const logger = require("../log/logger");
 
 module.exports = (service) => {
   const errorHandler = (req, res, error) => {
+    console.log(error.name);
     const { errors } = error;
     switch (error.name) {
       case "ValidationError":
         res.status(400).send({
           status: "error",
-          message: "Validation failed",
+          message: "Unable to process request due to validation failure",
+          data: { errors },
+        });
+        break;
+      case "SequelizeUniqueConstraintError":
+        res.status(422).send({
+          status: "Unique Constraint Error",
+          message: error.message,
           data: { errors },
         });
         break;
