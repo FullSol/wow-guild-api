@@ -15,10 +15,10 @@ const mockService = {
   readAll: sinon.stub(),
   readOne: sinon.stub(),
   update: sinon.stub(),
-  delete: sinon.stub(),
+  destroy: sinon.stub(),
 };
 
-describe.only("Profile Controller", () => {
+describe("Profile Controller", () => {
   describe("POST /api/v1/profiles", () => {
     it("should respond with 200", async () => {
       // Arrange
@@ -378,6 +378,88 @@ describe.only("Profile Controller", () => {
 
       // Assert
       expect(mockService.readOne.calledOnce).to.be.true;
+      expect(response.status).to.equal(500);
+      expect(response.body).to.deep.equal({
+        status: "error",
+        message: "Internal Server Error",
+      });
+    });
+  });
+
+  describe("DELETE /api/v1/profiles/:id", () => {
+    it("Should respond with an object based on id", async () => {
+      // Arrange
+      mockService.destroy.resolves(1);
+
+      app.use("/api/v1/profiles/", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/1")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.destroy.calledOnce).to.be.true;
+      expect(response.status).to.equal(200);
+      expect(response.body).to.equal(1);
+    });
+
+    it("should respond with internal server error due to invalid id", async () => {
+      // Arrange
+      mockService.destroy.resolves(1);
+
+      app.use("/api/v1/profiles/", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/doggie")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.destroy.called).to.be.false;
+      expect(response.status).to.equal(500);
+    });
+
+    it("Should respond with a no deletion message", async () => {
+      // Arrange
+      mockService.destroy.resolves(0);
+
+      app.use("/api/v1/profiles", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/1")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.destroy.calledOnce).to.be.true;
+      expect(response.status).to.equal(404);
+      expect(response.body).to.deep.equal({
+        message: "no resource found for deletion.",
+      });
+    });
+
+    it("Should respond with 500 internal server error from service", async () => {
+      // Arrange
+      mockService.destroy.throws(new Error("Internal Server Error"));
+
+      app.use("/api/v1/profiles/", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .delete("/api/v1/profiles/1")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      expect(mockService.destroy.calledOnce).to.be.true;
       expect(response.status).to.equal(500);
       expect(response.body).to.deep.equal({
         status: "error",
