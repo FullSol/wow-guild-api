@@ -4,7 +4,7 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
 const express = require("express");
-const Controller = require("../../controllers/profileController");
+const Controller = require("../../controllers/userController");
 const {
   AggregateValidationError,
 } = require("../../errors/custom/AggregateValidationError");
@@ -20,11 +20,11 @@ const mockService = {
   readAll: sinon.stub(),
   readOne: sinon.stub(),
   update: sinon.stub(),
-  destroy: sinon.stub(),
+  delete: sinon.stub(),
 };
 
-describe("Profile Controller", () => {
-  describe("POST /api/v1/profiles", () => {
+describe("User Controller", () => {
+  describe("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
       // Arrange
       const validJsonObject = {
@@ -32,11 +32,11 @@ describe("Profile Controller", () => {
       };
       mockService.create.resolves(1);
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .post("/api/v1/profiles/")
+        .post("/api/v1/users/")
         .send(validJsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -46,7 +46,7 @@ describe("Profile Controller", () => {
       expect(mockService.create.calledOnce).to.be.true;
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal({
-        message: "Profile created successfully",
+        message: "User created successfully",
       });
     });
 
@@ -67,10 +67,10 @@ describe("Profile Controller", () => {
 
       mockService.create.throws(new AggregateValidationError(errors, message));
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       const response = await supertest(app)
-        .post("/api/v1/profiles")
+        .post("/api/v1/users")
         .send(invalidJsonObject)
         .then((response) => response)
         .catch((error) => error);
@@ -96,7 +96,7 @@ describe("Profile Controller", () => {
             path: "username",
             value: "testUser",
             origin: "DB",
-            instance: ["Profile"],
+            instance: ["User"],
             validatorKey: "not_unique",
             validatorName: null,
             validatorArgs: [],
@@ -110,10 +110,10 @@ describe("Profile Controller", () => {
         new SequelizeUniqueConstraintError(errors, message)
       );
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       const response = await supertest(app)
-        .post("/api/v1/profiles")
+        .post("/api/v1/users")
         .send(duplicateObject)
         .then((response) => response)
         .catch((error) => error);
@@ -134,11 +134,11 @@ describe("Profile Controller", () => {
 
       mockService.create.throws(new Error("Internal Server Error"));
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .post("/api/v1/profiles/")
+        .post("/api/v1/users/")
         .send(validJsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -154,7 +154,7 @@ describe("Profile Controller", () => {
     });
   });
 
-  describe("GET /api/v1/profiles", () => {
+  describe("GET /api/v1/users", () => {
     it("Should respond with an array of objects", async () => {
       // Arrange
       const jsonObject = [
@@ -165,11 +165,11 @@ describe("Profile Controller", () => {
 
       mockService.readAll.resolves(jsonObject);
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/")
+        .get("/api/v1/users/")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -187,11 +187,11 @@ describe("Profile Controller", () => {
 
       mockService.readAll.resolves(jsonObject);
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/")
+        .get("/api/v1/users/")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -211,11 +211,11 @@ describe("Profile Controller", () => {
 
       mockService.readAll.throws(new Error("Internal Server Error"));
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/")
+        .get("/api/v1/users/")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -231,7 +231,7 @@ describe("Profile Controller", () => {
     });
   });
 
-  describe("GET /api/v1/profiles/:id", () => {
+  describe("GET /api/v1/users/:id", () => {
     it("Should respond with an object based on id", async () => {
       // Arrange
       const jsonObject = {
@@ -239,11 +239,11 @@ describe("Profile Controller", () => {
       };
       mockService.readOne.resolves(jsonObject);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/1")
+        .get("/api/v1/users/1")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -262,11 +262,11 @@ describe("Profile Controller", () => {
       };
       mockService.readOne.resolves(jsonObject);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/doggie")
+        .get("/api/v1/users/doggie")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -283,11 +283,11 @@ describe("Profile Controller", () => {
         new ResourceNotFoundError("Resource not found")
       );
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/1")
+        .get("/api/v1/users/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
@@ -307,11 +307,11 @@ describe("Profile Controller", () => {
 
       mockService.readOne.resolves(jsonObject);
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/1")
+        .get("/api/v1/users/1")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -331,11 +331,11 @@ describe("Profile Controller", () => {
 
       mockService.readOne.throws(new Error("Internal Server Error"));
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/1")
+        .get("/api/v1/users/1")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -351,7 +351,7 @@ describe("Profile Controller", () => {
     });
   });
 
-  describe("PATCH /api/v1/profiles/:id", () => {
+  describe("PATCH /api/v1/users/:id", () => {
     it("Should respond with an object based on id", async () => {
       // Arrange
       const jsonObject = {
@@ -359,11 +359,11 @@ describe("Profile Controller", () => {
       };
       mockService.update.resolves(1);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .patch("/api/v1/profiles/1")
+        .patch("/api/v1/users/1")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -392,10 +392,10 @@ describe("Profile Controller", () => {
 
       mockService.update.throws(new AggregateValidationError(errors, message));
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       const response = await supertest(app)
-        .patch("/api/v1/profiles/1")
+        .patch("/api/v1/users/1")
         .send(invalidJsonObject)
         .then((response) => response)
         .catch((error) => error);
@@ -414,11 +414,11 @@ describe("Profile Controller", () => {
         new ResourceNotFoundError("Resource not found")
       );
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .patch("/api/v1/profiles/1")
+        .patch("/api/v1/users/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
@@ -439,11 +439,11 @@ describe("Profile Controller", () => {
       };
       mockService.update.resolves(jsonObject);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .patch("/api/v1/profiles/doggie")
+        .patch("/api/v1/users/doggie")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -462,11 +462,11 @@ describe("Profile Controller", () => {
 
       mockService.readOne.throws(new Error("Internal Server Error"));
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/profiles/1")
+        .get("/api/v1/users/1")
         .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
@@ -482,61 +482,61 @@ describe("Profile Controller", () => {
     });
   });
 
-  describe("DELETE /api/v1/profiles/:id", () => {
+  describe("DELETE /api/v1/users/:id", () => {
     it("Should respond with an object based on id", async () => {
       // Arrange
-      mockService.destroy.resolves(1);
+      mockService.delete.resolves(1);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/1")
+        .delete("/api/v1/users/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.destroy.calledOnce).to.be.true;
+      expect(mockService.delete.calledOnce).to.be.true;
       expect(response.status).to.equal(200);
       expect(response.body).to.equal(1);
     });
 
     it("should respond with internal server error due to invalid id", async () => {
       // Arrange
-      mockService.destroy.resolves(1);
+      mockService.delete.resolves(1);
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/doggie")
+        .delete("/api/v1/users/doggie")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.destroy.called).to.be.false;
+      expect(mockService.delete.called).to.be.false;
       expect(response.status).to.equal(500);
     });
 
     it("Should respond with a ResourceNotFoundError", async () => {
       // Arrange
-      mockService.destroy.throws(
+      mockService.delete.throws(
         new ResourceNotFoundError("Resource not found")
       );
 
-      app.use("/api/v1/profiles", Controller(mockService));
+      app.use("/api/v1/users", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/1")
+        .delete("/api/v1/users/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.destroy.calledOnce).to.be.true;
+      expect(mockService.delete.calledOnce).to.be.true;
       expect(response.status).to.equal(404);
       expect(response.body).to.deep.equal({
         status: "ResourceNotFoundError",
@@ -546,19 +546,19 @@ describe("Profile Controller", () => {
 
     it("Should respond with 500 internal server error from service", async () => {
       // Arrange
-      mockService.destroy.throws(new Error("Internal Server Error"));
+      mockService.delete.throws(new Error("Internal Server Error"));
 
-      app.use("/api/v1/profiles/", Controller(mockService));
+      app.use("/api/v1/users/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .delete("/api/v1/profiles/1")
+        .delete("/api/v1/users/1")
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.destroy.calledOnce).to.be.true;
+      expect(mockService.delete.calledOnce).to.be.true;
       expect(response.status).to.equal(500);
       expect(response.body).to.deep.equal({
         status: "error",

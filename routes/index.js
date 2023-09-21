@@ -1,22 +1,20 @@
 "use strict";
 // Import Models
-const { Profile } = require("../models");
+const { User } = require("../models");
 
 // Import Services
-const { ProfileService } = require("../services");
+const { UserService } = require("../services");
 
 // Instantiate services with their models
-const profileService = new ProfileService(Profile);
+const userService = new UserService(User);
 
 // Import controllers
 const indexController = require("../controllers/index");
-const profileController = require("../controllers/profileController")(
-  profileService
-);
+const userController = require("../controllers/userController")(userService);
 
 // Set routes for the application
 module.exports = (app) => {
   app.use("/", indexController);
   app.use("/api/v1/", indexController);
-  app.use("/api/v1/profiles", profileController);
+  app.use("/api/v1/users", userController);
 };
