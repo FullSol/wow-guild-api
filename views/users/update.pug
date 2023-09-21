@@ -1,0 +1,51 @@
+extends ../layout
+
+block content
+    
+
+    h1 Update: #{user.username}
+    form(action="" id="newUserForm" method="POST")
+        input(type='hidden' name='user_id' value=`${user.id}`)
+        label(for="password") Password:
+        input(type="password", name="password", required)
+        br
+        label(for="repeat_password") Repeat Password:
+        input(type="password", name="repeat_password", required)
+        br
+        label(for="email") Email:
+        input(type="email", name="email", required)
+        br
+        button(type="submit") Update User
+
+    script.
+        let newUserForm = document.getElementById("newUserForm");
+        newUserForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            // handle submit
+            const id = e.target.user_id.value
+            const password = e.target.password.value
+            const repeat_password = e.target.repeat_password.value
+            const email = e.target.email.value
+
+            data = {
+                password : password,
+                repeat_password : repeat_password,
+                email : email
+            }
+
+            const apiUrl = `http://localhost:3001/api/v1/users/${id}`;
+            await fetch(apiUrl, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+                headers:{
+                    'Content-Type': 'application/json',
+                    'Accept':'text/html'
+                }
+            })
+            .then((response) => {
+                if (response.ok) {
+                window.location.href = `http://localhost:3001/api/v1/users/${id}`;
+                }
+            })
+            .catch((error) => console.log(error));
+        });
