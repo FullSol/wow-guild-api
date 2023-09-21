@@ -36,12 +36,40 @@ module.exports = (service) => {
     }
   };
 
+  router.get("/create", async (req, res) => {
+    try {
+      res.render("users/create");
+    } catch (error) {
+      logger.info("user controller: create");
+      logger.error(error.message);
+      errorHandler(req, res, error);
+    }
+  });
+
+  router.get("/update/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await service.readOne(id);
+      res.render("users/update", { user: user });
+    } catch (error) {
+      logger.info("user controller: update/:id");
+      logger.error(error.message);
+      errorHandler(req, res, error);
+    }
+  });
+
   router.post("/", async (req, res) => {
     try {
-      await service.create(req.body);
-      res.status(201).send({ message: "Profile created successfully" });
+      // Attempt to create a new user
+      const result = await service.create(req.body);
+
+      const acceptedHeader = req.get("Accept").split(",");
+      res.status(201);
+      if (acceptedHeader[0] === "text/html")
+        res.render("users/created", { user: result });
+      else res.json(result);
     } catch (error) {
-      logger.info("profile controller: create");
+      logger.info("user controller: create");
       logger.error(error.message);
       errorHandler(req, res, error);
     }
@@ -50,9 +78,13 @@ module.exports = (service) => {
   router.get("/", async (req, res) => {
     try {
       const response = await service.readAll();
-      res.status(200).json(response);
+      res.status(200);
+      const acceptedHeader = req.get("Accept").split(",");
+      if (acceptedHeader[0] === "text/html")
+        res.render("users/readAll", { users: response });
+      else res.json(response);
     } catch (error) {
-      logger.info("profile controller: get all");
+      logger.info("user controller: get all");
       logger.error(error.message);
       errorHandler(req, res, error);
     }
@@ -62,12 +94,14 @@ module.exports = (service) => {
     try {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
-      const result = await service.readOne(id);
-      console.log(result);
-      res.status(200).json(result);
+      const response = await service.readOne(id);
+      const acceptedHeader = req.get("Accept").split(",");
+      res.status(200);
+      if (acceptedHeader[0] === "text/html")
+        res.render("users/read", { user: response });
+      else res.json(response);
     } catch (error) {
-      console.log("I SHOULD BE HERE");
-      logger.info("profile controller: get one");
+      logger.info("user controller: get one");
       logger.error(error.message);
       errorHandler(req, res, error);
     }
@@ -77,11 +111,20 @@ module.exports = (service) => {
     try {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
+
       const result = await service.update(id, req.body);
-      console.log(result);
-      res.status(200).json(result);
+
+      res.status(200);
+
+      const acceptedHeader = req.get("Accept").split(",");
+
+      if (acceptedHeader[0] === "text/html") {
+        res.send();
+      } else {
+        res.json(result);
+      }
     } catch (error) {
-      logger.info("profile controller: patch");
+      logger.info("user controller: patch");
       logger.error(error.message);
       errorHandler(req, res, error);
     }
@@ -91,12 +134,12 @@ module.exports = (service) => {
     try {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
-      const result = await service.destroy(id, req.body);
+      const result = await service.delete(id, req.body);
       if (result === 0)
         res.status(404).send({ message: "no resource found for deletion." });
-      res.status(200).json(result);
+      else res.status(200).json(result);
     } catch (error) {
-      logger.info("profile controller: delete");
+      logger.info("user controller: delete");
       logger.error(error.message);
       errorHandler(req, res, error);
     }

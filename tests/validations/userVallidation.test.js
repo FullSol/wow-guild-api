@@ -3,11 +3,11 @@
 const {
   createSchema,
   updateSchema,
-} = require("../../validations/profileValidations");
+} = require("../../validations/userValidations");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("Profile Validations", () => {
+describe("User Validations", () => {
   describe("create schema", () => {
     it("should validate a valid update Schema object", () => {
       const validJsonObject = {

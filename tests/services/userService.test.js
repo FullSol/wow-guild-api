@@ -2,9 +2,9 @@
 
 const { expect } = require("chai");
 const sinon = require("sinon");
-const { ProfileService } = require("../../services");
+const { UserService } = require("../../services");
 
-describe("Profile Service", () => {
+describe("User Service", () => {
   let service;
 
   const jsonObjectArray = [
@@ -34,7 +34,7 @@ describe("Profile Service", () => {
       const validJsonObject = { username: "testUser", password: "password" };
       const mockRepo = { create: sinon.stub().resolves(1) };
       const createSchema = { validate: sinon.stub().returnsThis() };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setCreateSchema(createSchema);
 
       // Act
@@ -64,7 +64,7 @@ describe("Profile Service", () => {
       ];
 
       const createSchema = { validate: sinon.stub().throws(validationError) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setCreateSchema(createSchema);
 
       try {
@@ -89,7 +89,7 @@ describe("Profile Service", () => {
       };
       const validJsonObject = { username: "testUser", password: "password" };
       const createSchema = { validate: sinon.stub().returnsThis() };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setCreateSchema(createSchema);
 
       try {
@@ -112,7 +112,7 @@ describe("Profile Service", () => {
     it("should respond with an array of objects", async () => {
       // Arrange
       const mockRepo = { findAll: sinon.stub().resolves(jsonObjectArray) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       // Act
       const result = await service.readAll();
@@ -126,7 +126,7 @@ describe("Profile Service", () => {
       // Arrange
       const emptyArray = [];
       const mockRepo = { findAll: sinon.stub().resolves(emptyArray) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       // Act
       const result = await service.readAll();
@@ -141,7 +141,7 @@ describe("Profile Service", () => {
       const mockRepo = {
         findAll: sinon.stub().throws(new Error("Internal Server Error")),
       };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act
@@ -169,7 +169,7 @@ describe("Profile Service", () => {
       };
       const mockRepo = { findByPk: sinon.stub().resolves(jsonObject) };
       const id = 1;
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       // Act
       const result = await service.readOne(id);
@@ -183,7 +183,7 @@ describe("Profile Service", () => {
       // Arrange
       const invalidId = null; // This should cause an error
       const mockRepo = { findByPk: sinon.stub().resolves(1) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act
@@ -203,7 +203,7 @@ describe("Profile Service", () => {
       // Arrange
       const id = 1;
       const mockRepo = { findByPk: sinon.stub().resolves(null) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act
@@ -225,7 +225,7 @@ describe("Profile Service", () => {
         findByPk: sinon.stub().throws(new Error("Internal Server Error")),
       };
 
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act
@@ -251,7 +251,7 @@ describe("Profile Service", () => {
       const invalidId = null;
       const mockRepo = { update: sinon.stub().resolves(validJsonObject) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -275,7 +275,7 @@ describe("Profile Service", () => {
       const validData = { field1: "data1" };
       const mockRepo = { update: sinon.stub().resolves({ 0: 0 }) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -285,7 +285,6 @@ describe("Profile Service", () => {
         // Assert
         expect(result).to.deep.equal(null);
       } catch (error) {
-        console.log(error);
         // Assert
         expect(mockRepo.update.called).to.be.true;
         expect(error.name).to.equal("ResourceNotFoundError");
@@ -311,7 +310,7 @@ describe("Profile Service", () => {
       ];
 
       const updateSchema = { validate: sinon.stub().throws(validationError) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -338,7 +337,7 @@ describe("Profile Service", () => {
       };
 
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -362,7 +361,7 @@ describe("Profile Service", () => {
       // Arrange
       const id = 1;
       const mockRepo = { destroy: sinon.stub().resolves(1) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       // Act
       const result = await service.delete(id);
@@ -376,7 +375,7 @@ describe("Profile Service", () => {
       // Arrange
       const id = 1;
       const mockRepo = { destroy: sinon.stub().resolves(0) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       // Act
       const result = await service.delete(id);
@@ -390,7 +389,7 @@ describe("Profile Service", () => {
       // Arrange
       const invalidId = null; // This should cause an error
       const mockRepo = { destroy: sinon.stub().resolves(1) };
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act
@@ -412,7 +411,7 @@ describe("Profile Service", () => {
         destroy: sinon.stub().throws(new Error("Internal Server Error")),
       };
       const id = 1; // valid id
-      service = new ProfileService(mockRepo);
+      service = new UserService(mockRepo);
 
       try {
         // Act

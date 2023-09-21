@@ -1,0 +1,36 @@
+extends ../layout
+
+block content
+  script.
+    function handleGoBack(){
+      window.location.href='/api/v1/users/'
+    }
+
+    function createNewUser(){
+      window.location.href='/api/v1/users/create'
+    }
+
+    function updateUser(id){
+      window.location.href=`/api/v1/users/update/${id}`
+    }
+
+    function handleDelete(id){
+      if(confirm('Are you sure you want to delete this user?')){
+        const apiUrl = `http://localhost:3001/api/v1/users/${id}`;
+        fetch(apiUrl,{method:'DELETE'})
+        .then((response) => {
+          if(response.ok) window.location.href='/api/v1/users/'
+        })
+      }
+    }
+
+  h1 User Details
+  p Name: #{user.username}
+  p Email: #{user.email}
+  p createdAt: #{user.createdAt}
+  p updatedAt: #{user.updatedAt}
+  br
+  button(type='button', onclick=`handleGoBack()`) View all Users
+  button(type='button', onclick=`updateUser(${user.id})`) Update User
+  button(type='button', onclick=`handleDelete(${user.id})`) Delete User
+  button(type='button', onclick=`createNewUser()`) Create a new User

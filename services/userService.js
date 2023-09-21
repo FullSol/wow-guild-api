@@ -6,7 +6,7 @@ const saltRounds = 10; // Number of salt rounds for hashing
 const {
   createSchema,
   updateSchema,
-} = require("../validations/profileValidations");
+} = require("../validations/userValidations");
 const { Op, Sequelize } = require("sequelize");
 
 const {
@@ -28,7 +28,7 @@ const createErrorsArray = (error) => {
   }
 };
 
-class ProfileService {
+class UserService {
   constructor(repo) {
     this.Repo = repo;
     this.createSchema = createSchema;
@@ -57,7 +57,7 @@ class ProfileService {
       if (result <= 1) console.log("user found");
       else console.log("no user found");
     } catch (error) {
-      logger.info("profile service: authenticate");
+      logger.info("user service: authenticate");
       logger.error(error.message);
       throw error;
     }
@@ -87,7 +87,7 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      logger.info("profile service: create");
+      logger.info("user service: create");
       logger.error(error.message);
       if (error.name === "SequelizeUniqueConstraintError") {
         delete error.errors[0].instance.password;
@@ -107,7 +107,7 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      logger.info("profile service: read all");
+      logger.info("user service: read all");
       logger.error(error.message);
       throw error;
     }
@@ -126,7 +126,7 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      logger.info("profile service: read one");
+      logger.info("user service: read one");
       logger.error(error.message);
       throw error;
     }
@@ -161,7 +161,7 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      logger.info("profile service: update");
+      logger.info("user service: update");
       logger.error(error.message);
       throw error;
     }
@@ -179,11 +179,11 @@ class ProfileService {
       // Return the results
       return result;
     } catch (error) {
-      logger.info("profile service: delete");
+      logger.info("user service: delete");
       logger.error(error.message);
       throw error;
     }
   };
 }
 
-module.exports = ProfileService;
+module.exports = UserService;
