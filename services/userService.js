@@ -154,8 +154,7 @@ class UserService {
           id: id,
         },
       });
-      console.log(id);
-      console.log(resourceData);
+
       if (result[0] === 0)
         throw new ResourceNotFoundError("Resource not found");
 

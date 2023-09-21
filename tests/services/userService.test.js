@@ -285,7 +285,6 @@ describe("User Service", () => {
         // Assert
         expect(result).to.deep.equal(null);
       } catch (error) {
-        console.log(error);
         // Assert
         expect(mockRepo.update.called).to.be.true;
         expect(error.name).to.equal("ResourceNotFoundError");
