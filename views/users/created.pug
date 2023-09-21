@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  h1 Resource Created
+  p Your resource has been successfully created.
+  br
+  p Name: #{user.username}
+  p Email: #{user.email}
+  p createdAt: #{user.createdAt}
+  p updatedAt: #{user.updatedAt}
+
+  // JavaScript code to redirect to the readAll template after a delay
+  script.
+    setTimeout(function() {
+      window.location.href = '/api/v1/users';
+    }, 3000); // Redirect after 3 seconds
