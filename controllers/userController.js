@@ -6,7 +6,6 @@ const logger = require("../log/logger");
 
 module.exports = (service) => {
   const errorHandler = (req, res, error) => {
-    console.log(error);
     const { errors } = error;
     switch (error.name) {
       case "ValidationError":
@@ -38,7 +37,13 @@ module.exports = (service) => {
   };
 
   router.get("/create", async (req, res) => {
-    res.render("users/create");
+    try {
+      res.render("users/create");
+    } catch (error) {
+      logger.info("user controller: create");
+      logger.error(error.message);
+      errorHandler(req, res, error);
+    }
   });
 
   router.get("/update/:id", async (req, res) => {
@@ -47,7 +52,9 @@ module.exports = (service) => {
       const user = await service.readOne(id);
       res.render("users/update", { user: user });
     } catch (error) {
-      console.log(error);
+      logger.info("user controller: update/:id");
+      logger.error(error.message);
+      errorHandler(req, res, error);
     }
   });
 
@@ -104,14 +111,19 @@ module.exports = (service) => {
     try {
       const { id } = req.params;
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
+
       const result = await service.update(id, req.body);
+
       res.status(200);
+
       const acceptedHeader = req.get("Accept").split(",");
-      if (acceptedHeader[0] === "text/html")
-        res.render("users/updated", { user: result });
-      else res.json(result);
+
+      if (acceptedHeader[0] === "text/html") {
+        res.send();
+      } else {
+        res.json(result);
+      }
     } catch (error) {
-      console.log(error);
       logger.info("user controller: patch");
       logger.error(error.message);
       errorHandler(req, res, error);
@@ -121,14 +133,12 @@ module.exports = (service) => {
   router.delete("/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(id);
       if (id === null || isNaN(id)) throw new Error("invalid ID request");
       const result = await service.delete(id, req.body);
       if (result === 0)
         res.status(404).send({ message: "no resource found for deletion." });
       else res.status(200).json(result);
     } catch (error) {
-      console.log(error);
       logger.info("user controller: delete");
       logger.error(error.message);
       errorHandler(req, res, error);

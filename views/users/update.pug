@@ -34,16 +34,17 @@ block content
             }
 
             const apiUrl = `http://localhost:3001/api/v1/users/${id}`;
-            fetch(apiUrl, {
+            await fetch(apiUrl, {
                 method: 'PATCH',
                 body: JSON.stringify(data),
                 headers:{
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept':'text/html'
                 }
             })
             .then((response) => {
                 if (response.ok) {
-                window.location.href = `http://localhost:3001/api/v1/users/updated/${id}`;
+                window.location.href = `http://localhost:3001/api/v1/users/${id}`;
                 }
             })
             .catch((error) => console.log(error));
