@@ -9,8 +9,8 @@ const { UserService } = require("../services");
 const userService = new UserService(User);
 
 // Import controllers
-const indexController = require("../controllers/index");
-const userController = require("../controllers/userController")(userService);
+const { indexController, userController } =
+  require("../controllers")(userService);
 
 // Set routes for the application
 module.exports = (app) => {

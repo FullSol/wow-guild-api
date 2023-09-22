@@ -46,16 +46,28 @@ class UserService {
   authenticate = async (user) => {
     try {
       const { username, password } = user;
-      const result = await this.Repo.findAll({
+
+      // Retrieve the user from the DB based on the username alone
+      const users = await this.Repo.scope("withPassword").findAll({
         where: {
           username: username,
-          password: {
-            [Op.eq]: Sequelize.literal(`'${password}'`),
-          },
         },
       });
-      if (result <= 1) console.log("user found");
-      else console.log("no user found");
+
+      // Check if a user with the provided username exists
+      if (users.length === 0) {
+        throw new Error("User not found");
+      }
+
+      const storedUser = users[0];
+
+      // Compare the provided password with the stored hash
+      const isMatch = await bcrypt.compare(password, storedUser.password);
+
+      // Accept user authentication
+      if (isMatch) req.session.user = storedUser;
+      // Reject user authentication
+      else console.log("Authentication failed");
     } catch (error) {
       logger.info("user service: authenticate");
       logger.error(error.message);
@@ -65,8 +77,15 @@ class UserService {
 
   create = async (resourceData) => {
     try {
+      const { username, password, repeat_password, email } = resourceData;
+      console.log(username, password, repeat_password, email);
       // Validate the incoming data
-      const { error } = this.createSchema.validate(resourceData);
+      const { error } = this.createSchema.validate({
+        username,
+        password,
+        repeat_password,
+        email,
+      });
 
       if (error) {
         throw new AggregateValidationError(
@@ -76,17 +95,19 @@ class UserService {
       }
 
       // Hash the password
-      const hash = await bcrypt.hash(resourceData.password, saltRounds);
-
-      // Update the resourceData with the hashed password
-      resourceData.password = hash;
+      const password_hash = await bcrypt.hash(password, saltRounds);
 
       // Attempt to insert the new object
-      const result = await this.Repo.create(resourceData);
+      const result = await this.Repo.create({
+        username,
+        password: password_hash,
+        email,
+      });
 
       // Return the results
       return result;
     } catch (error) {
+      console.log(error);
       logger.info("user service: create");
       logger.error(error.message);
       if (error.name === "SequelizeUniqueConstraintError") {

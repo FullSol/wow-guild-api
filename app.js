@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const fs = require("fs");
 const routes = require("./routes");
+const session = require("express-session");
 
 const app = express();
 
@@ -12,6 +13,15 @@ const app = express();
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
   { flags: "a" }
+);
+
+// Session options
+app.use(
+  session({
+    secret: "this-is-the-song-that-never-ends",
+    resave: false, // Save session only if it has been modified
+    saveUninitialized: false, // No session for unauthenticated
+  })
 );
 
 // view engine setup
