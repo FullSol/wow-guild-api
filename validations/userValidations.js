@@ -34,38 +34,36 @@ const createSchema = Joi.object({
 const updateSchema = Joi.object({
   username: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).messages({
     "string.empty": `Username cannot be empty.`,
-    "any.required": `Username is required.`,
     "string.base": `Username should be a type of 'text'.`,
     "string.pattern.base": `Username should contain only alphanumeric characters and be between 3 and 30 characters long.`,
   }),
   password: Joi.string().when("username", {
     is: Joi.exist(), // Require password when username is provided
-    then: Joi.required().messages({
+    then: Joi.string().required().messages({
       "any.required": `Current password is required when changing the password.`,
     }),
-    otherwise: Joi.forbidden(),
+    otherwise: Joi.string(),
   }),
-  new_password: Joi.string().when(Joi.object({ password: Joi.exist() }), {
-    is: Joi.exist(), // Require newPassword when changing the password
-    then: Joi.required().messages({
+  new_password: Joi.string().when("password", {
+    is: Joi.exist(), // Require new_password when changing the password
+    then: Joi.string().required().messages({
       "any.required": `New password is required when changing the password.`,
     }),
-    otherwise: Joi.forbidden(),
+    otherwise: Joi.string(),
   }),
   repeat_password: Joi.string()
-    .valid(Joi.ref("newPassword"))
-    .when("newPassword", {
-      is: Joi.exist(), // Require repeatPassword when changing the password
-      then: Joi.required().messages({
+    .valid(Joi.ref("new_password"))
+    .when("new_password", {
+      is: Joi.exist(), // Require repeat_password when changing the password
+      then: Joi.string().required().messages({
         "any.required": `Repeat password must match the new password.`,
       }),
-      otherwise: Joi.forbidden(),
+      otherwise: Joi.string(),
     }),
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
     .messages({
       "string.empty": `Email cannot be empty.`,
-      "any.required": `Email is required.`,
       "string.base": `Email should be a valid email address.`,
       "string.email": `Email should be in a valid format (e.g., user@example.com).`,
     }),
