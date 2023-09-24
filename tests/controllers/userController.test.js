@@ -4,6 +4,7 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
 const express = require("express");
+const app = express();
 const Controller = require("../../controllers/userController");
 const {
   AggregateValidationError,
@@ -13,24 +14,31 @@ const {
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
 const { ResourceNotFoundError } = require("../../errors/custom");
 
-const app = express();
-
-const mockService = {
-  create: sinon.stub(),
-  readAll: sinon.stub(),
-  readOne: sinon.stub(),
-  update: sinon.stub(),
-  delete: sinon.stub(),
-};
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 describe("User Controller", () => {
+  const mockService = {
+    create: sinon.stub(),
+    readAll: sinon.stub(),
+    readOne: sinon.stub(),
+    update: sinon.stub(),
+    delete: sinon.stub(),
+  };
+
   describe("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
       // Arrange
       const validJsonObject = {
         field1: "data1",
       };
-      mockService.create.resolves(1);
+      const jsonObject = {
+        id: 1,
+        field1: "data1",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      mockService.create.resolves(jsonObject);
 
       app.use("/api/v1/users", Controller(mockService));
 
@@ -45,9 +53,7 @@ describe("User Controller", () => {
       // Assert
       expect(mockService.create.calledOnce).to.be.true;
       expect(response.status).to.equal(201);
-      expect(response.body).to.deep.equal({
-        message: "User created successfully",
-      });
+      expect(response.body).to.deep.equal(jsonObject);
     });
 
     it("should respond with 400 ValidationError", async () => {

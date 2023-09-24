@@ -2,28 +2,43 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const logger = require("morgan");
+const morgan = require("morgan");
 const fs = require("fs");
 const routes = require("./routes");
+const session = require("express-session");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
 // Create a write stream for the log file
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
+const accessLogStream = fs.createWriteStream(path.join("logs", "access.log"), {
+  flags: "a",
+});
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+
+// Session options
+app.use(
+  session({
+    secret: "this-is-the-song-that-never-ends",
+    resave: false, // Save session only if it has been modified
+    saveUninitialized: false, // No session for unauthenticated
+  })
 );
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
-app.use(logger("dev"));
-app.use(logger("combined", { stream: accessLogStream }));
+app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/api", limiter); // Apply to all routes under /api
 
 routes(app);
 

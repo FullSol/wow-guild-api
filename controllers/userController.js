@@ -2,10 +2,10 @@
 
 const express = require("express");
 const router = express.Router();
-const logger = require("../log/logger");
+const logger = require("../logger");
 
 module.exports = (service) => {
-  const errorHandler = (req, res, error) => {
+  function errorHandler(req, res, error) {
     const { errors } = error;
     switch (error.name) {
       case "ValidationError":
@@ -34,7 +34,7 @@ module.exports = (service) => {
           .send({ status: "error", message: "Internal Server Error" });
         break;
     }
-  };
+  }
 
   router.get("/create", async (req, res) => {
     try {
@@ -63,11 +63,8 @@ module.exports = (service) => {
       // Attempt to create a new user
       const result = await service.create(req.body);
 
-      const acceptedHeader = req.get("Accept").split(",");
-      res.status(201);
-      if (acceptedHeader[0] === "text/html")
-        res.render("users/created", { user: result });
-      else res.json(result);
+      // Send response
+      res.status(201).json(result);
     } catch (error) {
       logger.info("user controller: create");
       logger.error(error.message);
