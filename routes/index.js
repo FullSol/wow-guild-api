@@ -15,6 +15,6 @@ const { indexController, userController } =
 // Set routes for the application
 module.exports = (app) => {
   app.use("/", indexController);
-  app.use("/api/v1/", indexController);
+  app.use("/api/v1", indexController);
   app.use("/api/v1/users", userController);
 };
