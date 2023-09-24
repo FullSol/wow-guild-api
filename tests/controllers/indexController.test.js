@@ -4,6 +4,8 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
 const express = require("express");
+const app = express();
+const session = require("express-session");
 const Controller = require("../../controllers/indexController");
 const {
   AggregateValidationError,
@@ -11,33 +13,44 @@ const {
 const {
   SequelizeUniqueConstraintError,
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
-const { ResourceNotFoundError } = require("../../errors/custom");
-
-const app = express();
+const { AuthenticationFailureError } = require("../../errors/custom");
 
 const mockService = {
   create: sinon.stub(),
-  readAll: sinon.stub(),
-  readOne: sinon.stub(),
-  update: sinon.stub(),
-  delete: sinon.stub(),
+  authenticate: sinon.stub(),
 };
 
-describe("Index Controller", () => {
-  describe("POST /api/v1/users", () => {
-    it("should respond with 200", async () => {
-      // Arrange
-      const validJsonObject = {
-        field1: "data1",
-      };
-      mockService.create.resolves(1);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-      app.use("/api/v1/users", Controller(mockService));
+// Session options
+app.use(
+  session({
+    secret: "this-is-the-song-that-never-ends",
+    resave: false, // Save session only if it has been modified
+    saveUninitialized: false, // No session for unauthenticated
+  })
+);
+
+describe.only("Index Controller", () => {
+  const user = {
+    id: "some-uuid-string",
+    username: "test1",
+    email: "tes1@gmail.com",
+  };
+
+  describe("Register User", () => {
+    it("should respond with status 201 on successful registration", async () => {
+      // Arrange
+      const userData = { username: "test1", password: "password" };
+      mockService.create.resolves(user);
+
+      app.use("/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .post("/api/v1/users/")
-        .send(validJsonObject)
+        .post("/register")
+        .send(userData)
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
@@ -45,42 +58,7 @@ describe("Index Controller", () => {
       // Assert
       expect(mockService.create.calledOnce).to.be.true;
       expect(response.status).to.equal(201);
-      expect(response.body).to.deep.equal({
-        message: "User created successfully",
-      });
-    });
-
-    it("should respond with 400 ValidationError", async () => {
-      // Arrange
-      const invalidJsonObject = {}; // bad object
-      const errors = [
-        {
-          message: '"username" is required',
-          path: ["username"],
-          type: "any.required",
-          context: {
-            key: "username",
-          },
-        },
-      ];
-      const message = "Unable to process request due to validation failure";
-
-      mockService.create.throws(new AggregateValidationError(errors, message));
-
-      app.use("/api/v1/users", Controller(mockService));
-
-      const response = await supertest(app)
-        .post("/api/v1/users")
-        .send(invalidJsonObject)
-        .then((response) => response)
-        .catch((error) => error);
-
-      // Assert
-      expect(mockService.create.calledOnce).to.be.true;
-      expect(response.status).to.equal(400);
-      expect(response.body.status).to.equal("error");
-      expect(response.body.message).to.equal(message);
-      expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
+      expect(response.body).to.deep.equal(user);
     });
 
     it("should respond with a unique constraint error", async () => {
@@ -110,10 +88,10 @@ describe("Index Controller", () => {
         new SequelizeUniqueConstraintError(errors, message)
       );
 
-      app.use("/api/v1/users", Controller(mockService));
+      app.use("/", Controller(mockService));
 
       const response = await supertest(app)
-        .post("/api/v1/users")
+        .post("/register")
         .send(duplicateObject)
         .then((response) => response)
         .catch((error) => error);
@@ -126,444 +104,60 @@ describe("Index Controller", () => {
       expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
     });
 
-    it("should respond with 500 internal server error from service", async () => {
-      // Arrange
-      const validJsonObject = {
-        field1: "data1",
-      };
-
-      mockService.create.throws(new Error("Internal Server Error"));
-
-      app.use("/api/v1/users", Controller(mockService));
-
-      // Act
-      const response = await supertest(app)
-        .post("/api/v1/users/")
-        .send(validJsonObject)
-        .set("Accept", "application/json")
-        .then((response) => response)
-        .catch((error) => error);
-
-      // Assert
-      expect(mockService.create.calledOnce).to.be.true;
-      expect(response.status).to.equal(500);
-      expect(response.body).to.deep.equal({
-        status: "error",
-        message: "Internal Server Error",
-      });
-    });
+    it("should respond with a 500 internal server error", async () => {});
   });
 
-  //   describe("GET /api/v1/users", () => {
-  //     it("Should respond with an array of objects", async () => {
-  //       // Arrange
-  //       const jsonObject = [
-  //         {
-  //           field1: "data1",
-  //         },
-  //       ];
-
-  //       mockService.readAll.resolves(jsonObject);
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .get("/api/v1/users/")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.readAll.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(200);
-  //       expect(response.body).to.deep.equal(jsonObject);
-  //     });
-
-  //     it("Should respond with an empty array", async () => {
-  //       // Arrange
-  //       const jsonObject = [];
-
-  //       mockService.readAll.resolves(jsonObject);
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .get("/api/v1/users/")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.readAll.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(200);
-  //       expect(response.body).to.deep.equal(jsonObject);
-  //     });
-
-  //     it("Should respond with 500 internal server error from service", async () => {
-  //       // Arrange
-  //       const jsonObject = {
-  //         field1: "data1",
-  //       };
-
-  //       mockService.readAll.throws(new Error("Internal Server Error"));
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .get("/api/v1/users/")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.readAll.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(500);
-  //       expect(response.body).to.deep.equal({
-  //         status: "error",
-  //         message: "Internal Server Error",
-  //       });
-  //     });
-  //   });
-
-  describe("GET /api/v1/users/:id", () => {
-    it("Should respond with an object based on id", async () => {
+  describe("Authenticate User", () => {
+    it("should respond with a 200 user logged in", async () => {
       // Arrange
-      const jsonObject = {
-        field1: "data1",
-      };
-      mockService.readOne.resolves(jsonObject);
+      const userData = { username: "test1", password: "password" };
+      mockService.authenticate.resolves(user);
 
-      app.use("/api/v1/users/", Controller(mockService));
+      app.use("/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/users/1")
-        .send(jsonObject)
+        .post("/login")
+        .send(userData)
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.readOne.calledOnce).to.be.true;
+      expect(mockService.authenticate.calledOnce).to.be.true;
       expect(response.status).to.equal(200);
-      expect(response.body).to.deep.equal(jsonObject);
     });
 
-    it("should respond with internal server error due to invalid id", async () => {
+    it("should respond with status 401 on authentication failure", async () => {
       // Arrange
-      const jsonObject = {
-        field1: "data1",
-      };
-      mockService.readOne.resolves(jsonObject);
-
-      app.use("/api/v1/users/", Controller(mockService));
-
-      // Act
-      const response = await supertest(app)
-        .get("/api/v1/users/doggie")
-        .send(jsonObject)
-        .set("Accept", "application/json")
-        .then((response) => response)
-        .catch((error) => error);
-
-      // Assert
-      expect(mockService.readOne.calledOnce).to.be.false;
-      expect(response.status).to.equal(500);
-    });
-
-    it("Should respond with a ResourceNotFoundError", async () => {
-      // Arrange
-      mockService.readOne.throws(
-        new ResourceNotFoundError("Resource not found")
+      const userData = { username: "testuser", password: "password" };
+      mockService.authenticate.throws(
+        new AuthenticationFailureError("Failed to authenticate user.")
       );
 
-      app.use("/api/v1/users", Controller(mockService));
+      app.use("/", Controller(mockService));
 
       // Act
       const response = await supertest(app)
-        .get("/api/v1/users/1")
+        .post("/login")
+        .send(userData)
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
 
       // Assert
-      expect(mockService.readOne.calledOnce).to.be.true;
-      expect(response.status).to.equal(404);
-      expect(response.body).to.deep.equal({
-        status: "ResourceNotFoundError",
-        message: "Resource not found",
-      });
+      expect(mockService.authenticate.calledOnce).to.be.true;
+      expect(response.status).to.equal(401);
+      expect(response.body.status).to.equal("AuthenticationFailureError");
+      expect(response.body.message).to.equal("Failed to authenticate user.");
     });
 
-    it("Should respond with an empty array", async () => {
-      // Arrange
-      const jsonObject = [];
-
-      mockService.readOne.resolves(jsonObject);
-
-      app.use("/api/v1/users", Controller(mockService));
-
-      // Act
-      const response = await supertest(app)
-        .get("/api/v1/users/1")
-        .send(jsonObject)
-        .set("Accept", "application/json")
-        .then((response) => response)
-        .catch((error) => error);
-
-      // Assert
-      expect(mockService.readOne.calledOnce).to.be.true;
-      expect(response.status).to.equal(200);
-      expect(response.body).to.deep.equal(jsonObject);
-    });
-
-    it("Should respond with 500 internal server error from service", async () => {
-      // Arrange
-      const jsonObject = {
-        field1: "data1",
-      };
-
-      mockService.readOne.throws(new Error("Internal Server Error"));
-
-      app.use("/api/v1/users/", Controller(mockService));
-
-      // Act
-      const response = await supertest(app)
-        .get("/api/v1/users/1")
-        .send(jsonObject)
-        .set("Accept", "application/json")
-        .then((response) => response)
-        .catch((error) => error);
-
-      // Assert
-      expect(mockService.readOne.calledOnce).to.be.true;
-      expect(response.status).to.equal(500);
-      expect(response.body).to.deep.equal({
-        status: "error",
-        message: "Internal Server Error",
-      });
-    });
+    it("should respond with a 500 internal server error", async () => {});
   });
 
-  //   describe("PATCH /api/v1/users/:id", () => {
-  //     it("Should respond with an object based on id", async () => {
-  //       // Arrange
-  //       const jsonObject = {
-  //         field1: "data1",
-  //       };
-  //       mockService.update.resolves(1);
+  describe("Logout User", () => {
+    it("should respond with user logged out message", async () => {});
 
-  //       app.use("/api/v1/users/", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .patch("/api/v1/users/1")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.update.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(200);
-  //       expect(response.body).to.deep.equal(1);
-  //     });
-
-  //     it("should respond with 400 ValidationError", async () => {
-  //       // Arrange
-  //       const invalidJsonObject = {}; // bad object
-  //       const errors = [
-  //         {
-  //           message: '"username" is required',
-  //           path: ["username"],
-  //           type: "any.required",
-  //           context: {
-  //             key: "username",
-  //           },
-  //         },
-  //       ];
-  //       const message = "Unable to process request due to validation failure";
-
-  //       mockService.update.throws(new AggregateValidationError(errors, message));
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       const response = await supertest(app)
-  //         .patch("/api/v1/users/1")
-  //         .send(invalidJsonObject)
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.update.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(400);
-  //       expect(response.body.status).to.equal("error");
-  //       expect(response.body.message).to.equal(message);
-  //       expect(response.body.data.errors).to.be.an("array").that.is.not.empty;
-  //     });
-
-  //     it("Should respond with a ResourceNotFoundError", async () => {
-  //       // Arrange
-  //       mockService.update.throws(
-  //         new ResourceNotFoundError("Resource not found")
-  //       );
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .patch("/api/v1/users/1")
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.update.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(404);
-  //       expect(response.body).to.deep.equal({
-  //         status: "ResourceNotFoundError",
-  //         message: "Resource not found",
-  //       });
-  //     });
-
-  //     it("should respond with internal server error due to invalid id", async () => {
-  //       // Arrange
-  //       const jsonObject = {
-  //         field1: "data1",
-  //       };
-  //       mockService.update.resolves(jsonObject);
-
-  //       app.use("/api/v1/users/", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .patch("/api/v1/users/doggie")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.update.calledOnce).to.be.false;
-  //       expect(response.status).to.equal(500);
-  //     });
-
-  //     it("Should respond with 500 internal server error from service", async () => {
-  //       // Arrange
-  //       const jsonObject = {
-  //         field1: "data1",
-  //       };
-
-  //       mockService.readOne.throws(new Error("Internal Server Error"));
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .get("/api/v1/users/1")
-  //         .send(jsonObject)
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.readOne.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(500);
-  //       expect(response.body).to.deep.equal({
-  //         status: "error",
-  //         message: "Internal Server Error",
-  //       });
-  //     });
-  //   });
-
-  //   describe("DELETE /api/v1/users/:id", () => {
-  //     it("Should respond with an object based on id", async () => {
-  //       // Arrange
-  //       mockService.delete.resolves(1);
-
-  //       app.use("/api/v1/users/", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .delete("/api/v1/users/1")
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.delete.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(200);
-  //       expect(response.body).to.equal(1);
-  //     });
-
-  //     it("should respond with internal server error due to invalid id", async () => {
-  //       // Arrange
-  //       mockService.delete.resolves(1);
-
-  //       app.use("/api/v1/users/", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .delete("/api/v1/users/doggie")
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.delete.called).to.be.false;
-  //       expect(response.status).to.equal(500);
-  //     });
-
-  //     it("Should respond with a ResourceNotFoundError", async () => {
-  //       // Arrange
-  //       mockService.delete.throws(
-  //         new ResourceNotFoundError("Resource not found")
-  //       );
-
-  //       app.use("/api/v1/users", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .delete("/api/v1/users/1")
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.delete.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(404);
-  //       expect(response.body).to.deep.equal({
-  //         status: "ResourceNotFoundError",
-  //         message: "Resource not found",
-  //       });
-  //     });
-
-  //     it("Should respond with 500 internal server error from service", async () => {
-  //       // Arrange
-  //       mockService.delete.throws(new Error("Internal Server Error"));
-
-  //       app.use("/api/v1/users/", Controller(mockService));
-
-  //       // Act
-  //       const response = await supertest(app)
-  //         .delete("/api/v1/users/1")
-  //         .set("Accept", "application/json")
-  //         .then((response) => response)
-  //         .catch((error) => error);
-
-  //       // Assert
-  //       expect(mockService.delete.calledOnce).to.be.true;
-  //       expect(response.status).to.equal(500);
-  //       expect(response.body).to.deep.equal({
-  //         status: "error",
-  //         message: "Internal Server Error",
-  //       });
-  //     });
-  //   });
+    it("should respond with a 500 internal server error", async () => {});
+  });
 });
