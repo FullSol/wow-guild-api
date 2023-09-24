@@ -10,10 +10,9 @@ const session = require("express-session");
 const app = express();
 
 // Create a write stream for the log file
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
-);
+const accessLogStream = fs.createWriteStream(path.join("logs", "access.log"), {
+  flags: "a",
+});
 
 // Session options
 app.use(
