@@ -10,10 +10,11 @@ const createSchema = Joi.object({
       "string.base": `Username should be a type of 'text'.`,
       "string.pattern.base": `Username should contain only alphanumeric characters and be between 3 and 30 characters long.`,
     }),
-  password: Joi.string().required().messages({
+  password: Joi.string().required().min(8).max(30).messages({
     "string.empty": `Password cannot be empty.`,
     "any.required": `Password is a required field.`,
     "string.base": `Password should be a type of 'text'.`,
+    "string.min": "Password must be at least 8 characters long",
   }),
   repeat_password: Joi.valid(Joi.ref("password")).required(),
   email: Joi.string()
@@ -33,7 +34,6 @@ const createSchema = Joi.object({
 
 const updateSchema = Joi.object({
   username: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).messages({
-    "string.empty": `Username cannot be empty.`,
     "string.base": `Username should be a type of 'text'.`,
     "string.pattern.base": `Username should contain only alphanumeric characters and be between 3 and 30 characters long.`,
   }),
@@ -44,13 +44,7 @@ const updateSchema = Joi.object({
     }),
     otherwise: Joi.string(),
   }),
-  new_password: Joi.string().when("password", {
-    is: Joi.exist(), // Require new_password when changing the password
-    then: Joi.string().required().messages({
-      "any.required": `New password is required when changing the password.`,
-    }),
-    otherwise: Joi.string(),
-  }),
+  new_password: Joi.string().min(8).max(30),
   repeat_password: Joi.string()
     .valid(Joi.ref("new_password"))
     .when("new_password", {
@@ -63,7 +57,6 @@ const updateSchema = Joi.object({
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
     .messages({
-      "string.empty": `Email cannot be empty.`,
       "string.base": `Email should be a valid email address.`,
       "string.email": `Email should be in a valid format (e.g., user@example.com).`,
     }),
