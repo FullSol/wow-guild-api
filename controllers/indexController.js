@@ -78,7 +78,6 @@ module.exports = (service) => {
       req.session.user = user;
       res.status(200).json({ message: "Login successful" });
     } catch (error) {
-      console.log(error);
       logger.info("index controller: register");
       logger.error(error.message);
       errorHandler(req, res, error);

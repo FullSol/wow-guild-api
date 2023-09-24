@@ -80,7 +80,7 @@ class UserService {
   create = async (resourceData) => {
     try {
       const { username, password, repeat_password, email } = resourceData;
-      console.log(username, password, repeat_password, email);
+
       // Validate the incoming data
       const { error } = this.createSchema.validate({
         username,
@@ -109,7 +109,6 @@ class UserService {
       // Return the results
       return result;
     } catch (error) {
-      console.log(error);
       logger.info("user service: create");
       logger.error(error.message);
       if (error.name === "SequelizeUniqueConstraintError") {

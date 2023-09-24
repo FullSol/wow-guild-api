@@ -8,7 +8,7 @@ const {
 const chai = require("chai");
 const expect = chai.expect;
 
-describe.only("User Validations", () => {
+describe("User Validations", () => {
   describe("create schema", () => {
     it("should validate a valid update Schema object", () => {
       // Arrange
