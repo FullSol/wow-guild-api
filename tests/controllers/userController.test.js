@@ -4,6 +4,7 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
 const express = require("express");
+const app = express();
 const Controller = require("../../controllers/userController");
 const {
   AggregateValidationError,
@@ -12,8 +13,6 @@ const {
   SequelizeUniqueConstraintError,
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
 const { ResourceNotFoundError } = require("../../errors/custom");
-
-const app = express();
 
 const mockService = {
   create: sinon.stub(),
