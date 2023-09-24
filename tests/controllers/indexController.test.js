@@ -8,17 +8,9 @@ const app = express();
 const session = require("express-session");
 const Controller = require("../../controllers/indexController");
 const {
-  AggregateValidationError,
-} = require("../../errors/custom/AggregateValidationError");
-const {
   SequelizeUniqueConstraintError,
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
 const { AuthenticationFailureError } = require("../../errors/custom");
-
-const mockService = {
-  create: sinon.stub(),
-  authenticate: sinon.stub(),
-};
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,7 +24,12 @@ app.use(
   })
 );
 
-describe.only("Index Controller", () => {
+describe("Index Controller", () => {
+  const mockService = {
+    create: sinon.stub(),
+    authenticate: sinon.stub(),
+  };
+
   const user = {
     id: "some-uuid-string",
     username: "test1",
