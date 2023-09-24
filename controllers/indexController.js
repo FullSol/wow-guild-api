@@ -90,9 +90,10 @@ module.exports = (service) => {
     try {
       logger.info(`${req.session.user} has logged out.`);
       req.session.destroy;
-      res.redirect("/");
+      const acceptedHeader = req.get("Accept").split(",");
+      if (acceptedHeader[0] === "text/html") res.redirect("/");
+      else res.send("User  has been logged out");
     } catch (error) {
-      console.log(error);
       logger.info("index controller: logout");
       logger.error(error.message);
       errorHandler(req, res, error);
