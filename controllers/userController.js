@@ -2,7 +2,7 @@
 
 const express = require("express");
 const router = express.Router();
-const logger = require("../log/logger");
+const logger = require("../logger");
 
 module.exports = (service) => {
   function errorHandler(req, res, error) {
