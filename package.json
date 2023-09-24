@@ -20,7 +20,8 @@
     "pug": "^3.0.2",
     "sequelize": "^6.32.1",
     "sinon-chai": "^3.7.0",
-    "winston": "^3.10.0"
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "chai": "^4.3.7",
