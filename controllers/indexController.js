@@ -41,7 +41,9 @@ module.exports = (service) => {
   }
 
   router.get("/", function (req, res, next) {
-    res.render("index", { title: "Express" });
+    const user = req.session.user;
+
+    res.render("index", { title: "Express", user: user });
   });
 
   router.get("/register", async (req, res) => {
@@ -78,7 +80,20 @@ module.exports = (service) => {
       req.session.user = user;
       res.status(200).json({ message: "Login successful" });
     } catch (error) {
-      logger.info("index controller: register");
+      logger.info("index controller: login");
+      logger.error(error.message);
+      errorHandler(req, res, error);
+    }
+  });
+
+  router.get("/logout", async (req, res) => {
+    try {
+      logger.info(`${req.session.user} has logged out.`);
+      req.session.destroy;
+      res.redirect("/");
+    } catch (error) {
+      console.log(error);
+      logger.info("index controller: logout");
       logger.error(error.message);
       errorHandler(req, res, error);
     }
