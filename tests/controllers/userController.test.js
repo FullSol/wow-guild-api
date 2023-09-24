@@ -14,15 +14,18 @@ const {
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
 const { ResourceNotFoundError } = require("../../errors/custom");
 
-const mockService = {
-  create: sinon.stub(),
-  readAll: sinon.stub(),
-  readOne: sinon.stub(),
-  update: sinon.stub(),
-  delete: sinon.stub(),
-};
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 describe("User Controller", () => {
+  const mockService = {
+    create: sinon.stub(),
+    readAll: sinon.stub(),
+    readOne: sinon.stub(),
+    update: sinon.stub(),
+    delete: sinon.stub(),
+  };
+
   describe("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
       // Arrange
