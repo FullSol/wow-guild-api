@@ -1,7 +1,7 @@
 "use strict";
 
 const bcrypt = require("bcrypt");
-const logger = require("../log/logger");
+const logger = require("../logger");
 const saltRounds = 10; // Number of salt rounds for hashing
 const {
   createSchema,
@@ -13,6 +13,7 @@ const {
   AggregateValidationError,
   SequelizeUniqueConstraintError,
   ResourceNotFoundError,
+  AuthenticationFailureError,
 } = require("../errors/custom");
 
 const createErrorsArray = (error) => {
@@ -64,10 +65,11 @@ class UserService {
       // Compare the provided password with the stored hash
       const isMatch = await bcrypt.compare(password, storedUser.password);
 
-      // Accept user authentication
-      if (isMatch) req.session.user = storedUser;
-      // Reject user authentication
-      else console.log("Authentication failed");
+      if (isMatch) return storedUser; // Accept authentication
+      else
+        throw new AuthenticationFailureError(
+          "Username or Password not recognized"
+        ); // Reject authentication
     } catch (error) {
       logger.info("user service: authenticate");
       logger.error(error.message);
