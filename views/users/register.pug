@@ -1,0 +1,53 @@
+extends ../layout
+
+block content
+  h1 User Registration
+  form(action="", method="POST" id="registrationForm")
+    label(for="username") Username:
+    input(type="text", name="username", required)
+    br
+    label(for="password") Password:
+    input(type="password", name="password", required)
+    br
+    label(for="repeat_password") Repeat Password:
+    input(type="password", name="repeat_password", required)
+    br
+    label(for="email") Email:
+    input(type="email", name="email", required)
+    br
+    button(type="submit") Register User
+
+  script.
+    let registrationForm = document.getElementById('registrationForm')
+    registrationForm.addEventListener("submit", async(e) => {
+      e.preventDefault();
+
+      // handle submission
+      const id = e.target.user_id.value
+      const password = e.target.password.value
+      const repeat_password = e.target.repeat_password.value
+      const email = e.target.email.value
+
+      data = {
+          password : password,
+          repeat_password : repeat_password,
+          email : email
+      }
+
+      const apiUrl = `http://localhost:3001/register/${id}`;
+
+      fetch (aipUrl,{
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "text/html"
+        }
+      })
+      .then((response) => {
+          if (response.ok) {
+          window.location.href = `http://localhost:3001/login`;
+          }
+      })
+      .catch((error) => console.log(error))
+    });
