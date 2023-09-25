@@ -3,6 +3,7 @@
 const { expect } = require("chai");
 const sinon = require("sinon");
 const { UserService } = require("../../services");
+const { valid } = require("joi");
 
 describe("User Service", () => {
   let service;
@@ -181,13 +182,13 @@ describe("User Service", () => {
 
     it("should handle missing id request", async () => {
       // Arrange
-      const invalidId = null; // This should cause an error
+      const nullId = null; // This should cause an error
       const mockRepo = { findByPk: sinon.stub().resolves(1) };
       service = new UserService(mockRepo);
 
       try {
         // Act
-        await service.readOne(invalidId);
+        await service.readOne(nullId);
 
         // If no error is thrown, fail the test
         expect.fail("Expected Error, but no error was thrown.");
@@ -207,14 +208,14 @@ describe("User Service", () => {
 
       try {
         // Act
-        const result = await service.readOne(id);
+        await service.readOne(id);
 
         // Assert
-        expect(result).to.deep.equal(null);
+        expect.fail("Expected ResourceError, but no error was thrown.");
       } catch (error) {
         // Assert
         expect(mockRepo.findByPk.called).to.be.true;
-        expect(error.name).of.equal("ResourceNotFoundError");
+        expect(error.name).to.equal("ResourceNotFoundError");
       }
     });
 
@@ -224,7 +225,6 @@ describe("User Service", () => {
       const mockRepo = {
         findByPk: sinon.stub().throws(new Error("Internal Server Error")),
       };
-
       service = new UserService(mockRepo);
 
       try {
@@ -232,7 +232,7 @@ describe("User Service", () => {
         await service.readOne(id);
 
         // If no error is thrown, fail the test
-        expect.fail("Expected ValidationError, but no error was thrown.");
+        expect.fail("Expected Error, but no error was thrown.");
       } catch (error) {
         // Assert
         expect(mockRepo.findByPk.called).true;
@@ -243,7 +243,23 @@ describe("User Service", () => {
   });
 
   describe("Update", () => {
-    it("should return message: resource updated for a valid request", async () => {});
+    it("should return message: resource updated for a valid request", async () => {
+      // Arrange
+      const validJsonObject = { field1: "data1" };
+      const validId = 1;
+      const mockRepo = { update: sinon.stub().resolves(validJsonObject) };
+      const updateSchema = { validate: sinon.stub().returnsThis() };
+      service = new UserService(mockRepo);
+      service.setUpdateSchema(updateSchema);
+
+      // Act
+      const result = await service.update(validId);
+
+      // If no error is thrown, fail the test
+      expect(updateSchema.validate.called).to.be.true;
+      expect(mockRepo.update.called).to.be.true;
+      expect(result).to.deep.equal(validJsonObject);
+    });
 
     it("should handle missing id request", async () => {
       // Arrange
