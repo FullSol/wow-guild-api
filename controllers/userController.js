@@ -37,13 +37,7 @@ module.exports = (service) => {
   }
 
   router.get("/create", async (req, res) => {
-    try {
-      res.render("users/create");
-    } catch (error) {
-      logger.info("user controller: create");
-      logger.error(error.message);
-      errorHandler(req, res, error);
-    }
+    res.status(200).render("users/create", { title: "New User" });
   });
 
   router.get("/update/:id", async (req, res) => {
