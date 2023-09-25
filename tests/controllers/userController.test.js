@@ -46,7 +46,6 @@ describe("User Controller", () => {
         .catch((error) => error);
 
       // Assert
-      console.log(response);
     });
   });
 
@@ -203,7 +202,6 @@ describe("User Controller", () => {
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
-      console.log(response.body);
       // Assert
       expect(mockService.readAll.calledOnce).to.be.true;
       expect(response.status).to.equal(200);
