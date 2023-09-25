@@ -20,6 +20,10 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
 });
 
+// view engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
+
 // Session options
 app.use(
   session({
@@ -28,10 +32,6 @@ app.use(
     saveUninitialized: false, // No session for unauthenticated
   })
 );
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
 
 app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.json());
