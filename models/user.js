@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.Profile, { foreignKey: "UserID" });
     }
   }
   User.init(
@@ -44,6 +45,15 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+      hooks: {
+        beforeCreate: async (user) => {
+          // Create a profile for the user before creating the user
+          const profile = await sequelize.models.Profile.create({
+            user_id: user.id,
+          });
+          user.Profile = profile;
+        },
+      },
       sequelize,
       modelName: "User",
       defaultScope: {
