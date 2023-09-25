@@ -4,6 +4,7 @@ const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
 const express = require("express");
+const path = require("path");
 const app = express();
 const Controller = require("../../controllers/userController");
 const {
@@ -13,6 +14,12 @@ const {
   SequelizeUniqueConstraintError,
 } = require("../../errors/custom/SequelizeUniqueConstraintError");
 const { ResourceNotFoundError } = require("../../errors/custom");
+
+// view engine setup
+const viewPath = path.join(__dirname, "../../views");
+
+app.set("views", viewPath);
+app.set("view engine", "pug");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,6 +32,23 @@ describe("User Controller", () => {
     update: sinon.stub(),
     delete: sinon.stub(),
   };
+
+  describe.only("GET /api/v1/users/create", () => {
+    it("should have the correct title", async () => {
+      // Arrange
+      app.use("/api/v1/users", Controller(mockService));
+
+      // Act
+      const response = await supertest(app)
+        .get("/api/v1/users/")
+        .set("Accept", "application/json")
+        .then((response) => response)
+        .catch((error) => error);
+
+      // Assert
+      console.log(response);
+    });
+  });
 
   describe("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
@@ -176,11 +200,10 @@ describe("User Controller", () => {
       // Act
       const response = await supertest(app)
         .get("/api/v1/users/")
-        .send(jsonObject)
         .set("Accept", "application/json")
         .then((response) => response)
         .catch((error) => error);
-
+      console.log(response.body);
       // Assert
       expect(mockService.readAll.calledOnce).to.be.true;
       expect(response.status).to.equal(200);
