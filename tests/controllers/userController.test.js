@@ -33,7 +33,7 @@ describe("User Controller", () => {
     delete: sinon.stub(),
   };
 
-  describe.only("GET /api/v1/users/create", () => {
+  describe("GET /api/v1/users/create", () => {
     it("should have the correct title", async () => {
       // Arrange
       app.use("/api/v1/users", Controller(mockService));
