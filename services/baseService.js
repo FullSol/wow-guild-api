@@ -10,6 +10,19 @@ class BaseService {
     this.updateSchema = updateSchema;
   }
 
+  _createErrorsArray = (error) => {
+    try {
+      const message = [];
+      error.details.forEach((e) => {
+        message.push(e.message);
+      });
+      return message;
+    } catch (error) {
+      // Throw error for future handling
+      throw error;
+    }
+  };
+
   setUpdateSchema = (updateSchema) => {
     this.updateSchema = updateSchema;
   };
