@@ -1,6 +1,6 @@
 "use strict";
 
-const { ProfileCreateSchema } = require("../../validations/");
+const { ProfileUpdateSchema } = require("../../validations");
 const { expect } = require("chai");
 
 describe("Profile Validations", () => {
@@ -12,7 +12,7 @@ describe("Profile Validations", () => {
       };
 
       // Act
-      const result = ProfileCreateSchema.validate(validUpdateObject);
+      const result = ProfileUpdateSchema.validate(validUpdateObject);
 
       // Assert
       expect(result.error).to.be.undefined;
@@ -25,7 +25,7 @@ describe("Profile Validations", () => {
       };
 
       // Act
-      const result = ProfileCreateSchema.validate(validUpdateObject);
+      const result = ProfileUpdateSchema.validate(validUpdateObject);
 
       // Assert
       expect(result.error).to.exist;
@@ -41,7 +41,7 @@ describe("Profile Validations", () => {
       };
 
       // Act
-      const result = ProfileCreateSchema.validate(invalidBNet);
+      const result = ProfileUpdateSchema.validate(invalidBNet);
 
       // Assert
       expect(result.error).to.not.be.null;
