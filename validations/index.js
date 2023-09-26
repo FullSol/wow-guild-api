@@ -1,7 +1,8 @@
 const {
   createSchema: UserCreateSchema,
   updateSchema: UserUpdateSchema,
+  createSchema,
 } = require("./userValidations");
-const { createSchema: ProfileCreateSchema } = require("./profileValidations");
+const { updateSchema: ProfileUpdateSchema } = require("./profileValidations");
 
-module.exports = { UserCreateSchema, UserUpdateSchema, ProfileCreateSchema };
+module.exports = { UserCreateSchema, UserUpdateSchema, ProfileUpdateSchema };
