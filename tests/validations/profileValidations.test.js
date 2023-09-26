@@ -8,7 +8,8 @@ describe("Profile Validations", () => {
     it("should validate a valid update schema object", async () => {
       // Arrange
       const validUpdateObject = {
-        battle_net: "test#1234", // ^[A-Za-z0-9]+#[0-9]+$
+        userId: "550e8400-e29b-41d4-a716-446655440000",
+        battleNet: "test#1234", // ^[A-Za-z0-9]+#[0-9]+$
       };
 
       // Act
@@ -18,10 +19,25 @@ describe("Profile Validations", () => {
       expect(result.error).to.be.undefined;
     });
 
+    it("should not validate an invalid missing update Schema object", () => {
+      // Arrange
+      const invalidMissingObject = {};
+
+      // Act
+      const result = ProfileUpdateSchema.validate(invalidMissingObject);
+
+      // Assert
+      expect(result.error).to.exist;
+      result.error.details.forEach((detail) => {
+        expect(detail.type).to.equal("any.required");
+      });
+    });
+
     it("should not validate an invalid empty update Schema object", () => {
       // Arrange
       const validUpdateObject = {
-        battle_net: "",
+        userId: "",
+        battleNet: "",
       };
 
       // Act
