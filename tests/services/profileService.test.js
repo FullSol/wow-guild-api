@@ -100,7 +100,7 @@ describe("Profile Service", () => {
       const validUserId = "some-user-uuid";
       const mockRepo = { update: sinon.stub().resolves(validProfile) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new UserService(mockRepo);
+      service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       // Act
@@ -118,7 +118,7 @@ describe("Profile Service", () => {
       const invalidId = null;
       const mockRepo = { update: sinon.stub().resolves(validProfile) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new UserService(mockRepo);
+      service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -142,7 +142,7 @@ describe("Profile Service", () => {
       const validData = { field1: "data1" };
       const mockRepo = { update: sinon.stub().resolves({ 0: 0 }) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new UserService(mockRepo);
+      service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -177,7 +177,7 @@ describe("Profile Service", () => {
       ];
 
       const updateSchema = { validate: sinon.stub().throws(validationError) };
-      service = new UserService(mockRepo);
+      service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
@@ -204,7 +204,7 @@ describe("Profile Service", () => {
       };
 
       const updateSchema = { validate: sinon.stub().returnsThis() };
-      service = new UserService(mockRepo);
+      service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       try {
