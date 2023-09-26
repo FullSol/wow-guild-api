@@ -27,6 +27,8 @@ describe("User Validations", () => {
       expect(result.error).to.be.undefined;
     });
 
+    //TODO: Test the pattern
+
     it("should not validate for mismatched password and repeat_password", () => {
       // Arrange
       const invalidRepeatPassword = {
