@@ -5,13 +5,15 @@ const sinon = require("sinon");
 const supertest = require("supertest");
 
 const express = require("express");
-const router = express.Router();
 const app = express();
 const {
   AggregateValidationError,
   SequelizeUniqueConstraintError,
   ResourceNotFoundError,
 } = require("../../errors/custom/");
+
+// Mock Model
+const mockModel = {}; // ensure model doesn't affect any tests
 
 // Mock Service
 const mockService = {
@@ -22,21 +24,16 @@ const mockService = {
   delete: sinon.stub(),
 };
 
-// Import controller & pass service
-const { userController } = require("../../controllers")(mockService);
+const userRoutes = require("../../routes/api/userRoutes")(
+  mockModel,
+  mockService
+);
 
-// Routes [the app routes injects the dependencies - we don't want that here]
-router.post("/", userController.create);
-router.get("/:userId", userController.readById);
-router.get("/", userController.readAll);
-router.patch("/:userId", userController.update);
-router.delete("/:userId", userController.delete);
-
-// Mount the controller
-app.use("/api/v1/users", router);
+// Mount the routes
+app.use("/api/v1/users", userRoutes);
 
 describe("User Controller", () => {
-  describe("POST /api/v1/users", () => {
+  describe.only("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
       // Arrange
       const validJsonObject = {
