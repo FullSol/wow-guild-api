@@ -4,7 +4,6 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const fs = require("fs");
-const routes = require("./routes");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
 
@@ -21,7 +20,9 @@ const limiter = rateLimit({
 });
 
 // Import Routes
-const profileRoutes = require("./routes/profileRoutes");
+const profileApiRoutes = require("./routes/api/profileRoutes");
+const userApiRoutes = require("./routes/api/userRoutes");
+const userHTMLRoutes = require("./routes/html/userRoutes");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -44,8 +45,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", limiter); // Apply to all routes under /api
 
 // Mount the routes onto the app
-routes(app);
-app.use("/api/v1/profiles", profileRoutes);
+app.use("/api/v1/users", userApiRoutes);
+app.use("/api/v1/profiles", profileApiRoutes);
+app.use("/users", userHTMLRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
