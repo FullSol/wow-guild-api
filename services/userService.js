@@ -7,7 +7,8 @@ const {
   createSchema,
   updateSchema,
 } = require("../validations/userValidations");
-const { Op, Sequelize } = require("sequelize");
+const regexExp =
+  /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}(?:\/.*)?$/i;
 
 const {
   AggregateValidationError,
@@ -80,17 +81,12 @@ class UserService {
     }
   };
 
-  create = async (resourceData) => {
+  create = async (newUser) => {
     try {
-      const { username, password, repeat_password, email } = resourceData;
+      const { username, password, repeat_password, email } = newUser;
 
       // Validate the incoming data
-      const { error } = this.createSchema.validate({
-        username,
-        password,
-        repeat_password,
-        email,
-      });
+      const { error } = this.createSchema.validate(newUser);
 
       if (error) {
         throw new AggregateValidationError(
@@ -100,13 +96,13 @@ class UserService {
       }
 
       // Hash the password
-      const password_hash = await bcrypt.hash(password, saltRounds);
+      const password_hash = await bcrypt.hash(newUser.password, saltRounds);
 
       // Attempt to insert the new object
       const result = await this.Repo.create({
-        username,
+        username: newUser.username,
         password: password_hash,
-        email,
+        email: newUser.email,
       });
 
       // Return the results
@@ -141,8 +137,8 @@ class UserService {
   readOne = async (id) => {
     try {
       // Check for valid id
-      if (id === null || isNaN(id))
-        throw new Error("Resource ID must be numerical");
+      if (id === null || !regexExp.test(id))
+        throw new ResourceNotFoundError("Valid user id required");
 
       // Attempt to retrieve information from the DB
       const result = await this.Repo.findByPk(id);
@@ -157,28 +153,40 @@ class UserService {
     }
   };
 
-  update = async (id, resourceData) => {
+  update = async (id, updatedUser) => {
     try {
       // Check for valid id
-      if (id === null || isNaN(id))
-        throw new Error("Resource ID must be numerical");
+      if (id === null || !regexExp.test(id))
+        throw new ResourceNotFoundError("Valid user id is required");
 
       // validate the incoming data
-      const { error } = this.updateSchema.validate(resourceData);
+      const { error } = this.updateSchema.validate(updatedUser);
 
-      // If there was a validation error throw a ew validation error with error message
+      // If there was a validation error throw a validation error with error message
       if (error)
         throw new AggregateValidationError(
           createErrorsArray(error),
           "Unable to validate the submitted resource"
         );
 
+      // if the password is being updated hash it
+      let password_hash;
+      if (updatedUser.password)
+        password_hash = await bcrypt.hash(updatedUser.password, saltRounds);
+
       // Attempt to update information in the DB
-      const result = await this.Repo.update(resourceData, {
-        where: {
-          id: id,
+      const result = await this.Repo.update(
+        {
+          username: updatedUser.username,
+          password: password_hash,
+          email: updatedUser.email,
         },
-      });
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
 
       if (result[0] === 0)
         throw new ResourceNotFoundError("Resource not found");
@@ -186,6 +194,7 @@ class UserService {
       // Return the results
       return result;
     } catch (error) {
+      console.log(error);
       logger.info("user service: update");
       logger.error(error.message);
       throw error;
@@ -195,8 +204,8 @@ class UserService {
   delete = async (id) => {
     try {
       // Check for valid id
-      if (id === null || isNaN(id))
-        throw new Error("Resource ID must be numerical");
+      if (id === null || !regexExp.test(id))
+        throw new ResourceNotFoundError("Valid user id is required");
 
       // Attempt to delete information from the DB
       const result = this.Repo.destroy({ where: { id: id } });
