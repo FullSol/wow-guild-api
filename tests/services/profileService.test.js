@@ -94,18 +94,20 @@ describe("Profile Service", () => {
 
   describe("Update", () => {
     const validProfile = {
-      userId: "550e8400-e29b-41d4-a716-446655440000",
-      battleNet: "user-battle-net",
+      battleNet: "test#1234",
+      about: "This is a test user",
     };
+
     it("should return message: resource updated for a valid request", async () => {
       // Arrange
+      const userId = "550e8400-e29b-41d4-a716-446655440000";
       const mockRepo = { update: sinon.stub().resolves(profileObject) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
       service = new ProfileService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       // Act
-      const result = await service.update(validProfile);
+      const result = await service.update(userId, validProfile);
 
       // If no error is thrown, fail the test
       expect(updateSchema.validate.called).to.be.true;
@@ -115,9 +117,10 @@ describe("Profile Service", () => {
 
     it("should respond with ResourceNotFoundError", async () => {
       // Arrange
+      const userId = "550e8400-e29b-41d4-a716-446655440000";
       const validProfile = {
-        userId: "550e8400-e29b-41d4-a716-446655440000",
-        battleNet: "user-battle-net",
+        battleNet: "test#1234",
+        about: "This is a test user.",
       };
       const mockRepo = { update: sinon.stub().resolves({ 0: 0 }) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
@@ -126,7 +129,7 @@ describe("Profile Service", () => {
 
       try {
         // Act
-        await service.update(validProfile);
+        await service.update(userId, validProfile);
 
         // Assert
         expect.fail("Expected ResourceNotFound error, but received no error.");

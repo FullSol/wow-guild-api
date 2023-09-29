@@ -1,10 +1,12 @@
 "use strict";
 
+const logger = require("../logger");
+
 const {
   ResourceNotFoundError,
   AggregateValidationError,
 } = require("../errors/custom");
-const { ProfileUpdateSchema: updateSchema } = require("../validations/");
+const { ProfileUpdateSchema: updateSchema } = require("../validations");
 const BaseService = require("./baseService");
 
 class ProfileService extends BaseService {
@@ -12,12 +14,6 @@ class ProfileService extends BaseService {
     super(repo, undefined, updateSchema);
   }
 
-  /**
-   *
-   * @param {uuid} userId
-   * @returns {Object} Profile
-   * @description Returns a user's profile
-   */
   readOneByUser = async (userId) => {
     try {
       // Check for ID
@@ -39,7 +35,7 @@ class ProfileService extends BaseService {
     }
   };
 
-  update = async (updatedProfile) => {
+  update = async (userId, updatedProfile) => {
     try {
       const { error } = this.updateSchema.validate(updatedProfile);
 
@@ -51,8 +47,8 @@ class ProfileService extends BaseService {
 
       // Attempt to update the resource
       const result = await this.Repo.update(
-        { battle_net: updatedProfile.battleNet },
-        { where: { id: updatedProfile.id } }
+        { battle_net: updatedProfile.battleNet, about: updatedProfile.about },
+        { where: { user_id: userId } }
       );
 
       // Check if any rows were updated

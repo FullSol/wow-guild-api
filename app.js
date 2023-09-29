@@ -4,9 +4,29 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const fs = require("fs");
-const routes = require("./routes");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
+// Import the models
+let { User, Profile } = require("./models");
+
+// Import the services
+const { UserService, ProfileService } = require("./services");
+
+// Inject models into the services
+const userService = new UserService(User);
+const profileService = new ProfileService(Profile);
+
+// Import the controllers
+const { UserController, ProfileController } = require("./controllers/");
+
+// Inject services into the controllers
+const userController = new UserController(userService);
+const profileController = new ProfileController(profileService);
+
+// Import Routes
+const profileApiRoutes = require("./routes/api/profileRoutes");
+const userApiRoutes = require("./routes/api/userRoutes");
+const userHTMLRoutes = require("./routes/html/userRoutes");
 
 const app = express();
 
@@ -40,7 +60,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", limiter); // Apply to all routes under /api
 
-routes(app);
+// Mount the routes onto the app
+app.use("/api/v1/users", userApiRoutes(userController));
+app.use("/api/v1/profiles", profileApiRoutes(profileController));
+app.use("/users", userHTMLRoutes(userController));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
