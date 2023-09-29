@@ -6,6 +6,27 @@ const morgan = require("morgan");
 const fs = require("fs");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
+// Import the models
+let { User, Profile } = require("./models");
+
+// Import the services
+const { UserService, ProfileService } = require("./services");
+
+// Inject models into the services
+const userService = new UserService(User);
+const profileService = new ProfileService(Profile);
+
+// Import the controllers
+const { UserController, ProfileController } = require("./controllers/");
+
+// Inject services into the controllers
+const userController = new UserController(userService);
+const profileController = new ProfileController(profileService);
+
+// Import Routes
+const profileApiRoutes = require("./routes/api/profileRoutes");
+const userApiRoutes = require("./routes/api/userRoutes");
+const userHTMLRoutes = require("./routes/html/userRoutes");
 
 const app = express();
 
@@ -18,11 +39,6 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
 });
-
-// Import Routes
-const profileApiRoutes = require("./routes/api/profileRoutes");
-const userApiRoutes = require("./routes/api/userRoutes");
-const userHTMLRoutes = require("./routes/html/userRoutes");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -45,9 +61,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", limiter); // Apply to all routes under /api
 
 // Mount the routes onto the app
-app.use("/api/v1/users", userApiRoutes);
-app.use("/api/v1/profiles", profileApiRoutes);
-app.use("/users", userHTMLRoutes);
+app.use("/api/v1/users", userApiRoutes(userController));
+app.use("/api/v1/profiles", profileApiRoutes(profileController));
+app.use("/users", userHTMLRoutes(userController));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

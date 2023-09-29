@@ -12,9 +12,6 @@ const {
   ResourceNotFoundError,
 } = require("../../errors/custom/");
 
-// Mock Model
-const mockModel = {}; // ensure model doesn't affect any tests
-
 // Mock Service
 const mockService = {
   create: sinon.stub(),
@@ -24,16 +21,17 @@ const mockService = {
   delete: sinon.stub(),
 };
 
-const userRoutes = require("../../routes/api/userRoutes")(
-  mockModel,
-  mockService
-);
+// Import the controller
+const { UserController } = require("../../controllers");
+const userController = new UserController(mockService);
+
+const userRoutes = require("../../routes/api/userRoutes")(userController);
 
 // Mount the routes
 app.use("/api/v1/users", userRoutes);
 
 describe("User Controller", () => {
-  describe.only("POST /api/v1/users", () => {
+  describe("POST /api/v1/users", () => {
     it("should respond with 200", async () => {
       // Arrange
       const validJsonObject = {
@@ -229,7 +227,7 @@ describe("User Controller", () => {
     });
   });
 
-  describe("GET /api/v1/users/:id", () => {
+  describe("GET /api/v1/users/:userId", () => {
     it("Should respond with an object based on id", async () => {
       // Arrange
       const jsonObject = {
@@ -269,7 +267,7 @@ describe("User Controller", () => {
 
       // Assert
       expect(mockService.readOne.calledOnce).to.be.false;
-      expect(response.status).to.equal(500);
+      expect(response.status).to.equal(404);
     });
 
     it("Should respond with a ResourceNotFoundError", async () => {
@@ -432,7 +430,7 @@ describe("User Controller", () => {
 
       // Assert
       expect(mockService.update.calledOnce).to.be.false;
-      expect(response.status).to.equal(500);
+      expect(response.status).to.equal(404);
     });
 
     it("Should respond with 500 internal server error from service", async () => {

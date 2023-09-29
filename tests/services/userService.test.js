@@ -169,7 +169,7 @@ describe("User Service", () => {
         updatedAt: new Date(),
       };
       const mockRepo = { findByPk: sinon.stub().resolves(jsonObject) };
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       service = new UserService(mockRepo);
 
       // Act
@@ -194,15 +194,14 @@ describe("User Service", () => {
         expect.fail("Expected Error, but no error was thrown.");
       } catch (error) {
         // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal("Resource ID must be numerical");
+        expect(error.constructor.name).to.equal("ResourceNotFoundError");
         expect(mockRepo.findByPk.called).to.be.false;
       }
     });
 
     it("should respond with ResourceNotFoundError", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = { findByPk: sinon.stub().resolves(null) };
       service = new UserService(mockRepo);
 
@@ -221,7 +220,7 @@ describe("User Service", () => {
 
     it("should respond with a 500 Internal service error from the service", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = {
         findByPk: sinon.stub().throws(new Error("Internal Server Error")),
       };
@@ -245,15 +244,16 @@ describe("User Service", () => {
   describe("Update", () => {
     it("should return message: resource updated for a valid request", async () => {
       // Arrange
-      const validJsonObject = { field1: "data1" };
-      const validId = 1;
+      const validJsonObject = { email: "data1" };
+      const validId = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = { update: sinon.stub().resolves(validJsonObject) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
+      const updateData = { email: "data1", password: "password" };
       service = new UserService(mockRepo);
       service.setUpdateSchema(updateSchema);
 
       // Act
-      const result = await service.update(validId);
+      const result = await service.update(validId, updateData);
 
       // If no error is thrown, fail the test
       expect(updateSchema.validate.called).to.be.true;
@@ -272,14 +272,13 @@ describe("User Service", () => {
 
       try {
         // Act
-        await service.update(invalidId);
+        await service.update(invalidId, validJsonObject);
 
         // If no error is thrown, fail the test
         expect.fail("Expected Error, but no error was thrown.");
       } catch (error) {
         // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal("Resource ID must be numerical");
+        expect(error.constructor.name).to.equal("ResourceNotFoundError");
         expect(updateSchema.validate.called).to.be.false;
         expect(mockRepo.update.called).to.be.false;
       }
@@ -287,7 +286,7 @@ describe("User Service", () => {
 
     it("should respond with ResourceNotFoundError", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const validData = { field1: "data1" };
       const mockRepo = { update: sinon.stub().resolves({ 0: 0 }) };
       const updateSchema = { validate: sinon.stub().returnsThis() };
@@ -309,7 +308,7 @@ describe("User Service", () => {
 
     it("should return message: invalid request", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = { update: sinon.stub().resolves(1) };
       const invalidJsonObject = {}; // bad object
 
@@ -347,7 +346,7 @@ describe("User Service", () => {
     it("should respond with a 500 Internal service error from the service", async () => {
       // Arrange
       const validJsonObject = { field1: "data1" };
-      const id = 1; // valid id
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa"; // valid id
       const mockRepo = {
         update: sinon.stub().throws(new Error("Internal Server Error")),
       };
@@ -375,7 +374,7 @@ describe("User Service", () => {
   describe("delete", () => {
     it("should delete resource with provided PK", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = { destroy: sinon.stub().resolves(1) };
       service = new UserService(mockRepo);
 
@@ -389,7 +388,7 @@ describe("User Service", () => {
 
     it("should respond with 0 if nno records deleted", async () => {
       // Arrange
-      const id = 1;
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa";
       const mockRepo = { destroy: sinon.stub().resolves(0) };
       service = new UserService(mockRepo);
 
@@ -415,8 +414,7 @@ describe("User Service", () => {
         expect.fail("Expected Error, but no error was thrown.");
       } catch (error) {
         // Assert
-        expect(error.constructor.name).to.equal("Error");
-        expect(error.message).to.equal("Resource ID must be numerical");
+        expect(error.constructor.name).to.equal("ResourceNotFoundError");
         expect(mockRepo.destroy.called).to.be.false;
       }
     });
@@ -426,7 +424,7 @@ describe("User Service", () => {
       const mockRepo = {
         destroy: sinon.stub().throws(new Error("Internal Server Error")),
       };
-      const id = 1; // valid id
+      const id = "04072a64-ae75-4825-9025-420c9d4d8eaa"; // valid id
       service = new UserService(mockRepo);
 
       try {

@@ -1,9 +1,4 @@
-const userController = require("./userController");
-const profileController = require("./profileController");
+const UserController = require("./userController");
+const ProfileController = require("./profileController");
 
-module.exports = (service) => {
-  return {
-    userController: userController(service),
-    profileController: profileController(service),
-  };
-};
+module.exports = { UserController, ProfileController };

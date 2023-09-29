@@ -194,7 +194,6 @@ class UserService {
       // Return the results
       return result;
     } catch (error) {
-      console.log(error);
       logger.info("user service: update");
       logger.error(error.message);
       throw error;

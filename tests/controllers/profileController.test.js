@@ -1,32 +1,31 @@
 "use strict";
 
-// App setup
-const express = require("express");
-const router = express.Router();
-const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Testing suite setup
 const { expect } = require("chai");
 const sinon = require("sinon");
 const supertest = require("supertest");
+
+const express = require("express");
+const app = express();
 
 // Mock Service
 const mockService = {
   readOneByUser: sinon.stub(),
   update: sinon.stub(),
+  readOne: sinon.stub(),
+  update: sinon.stub(),
+  delete: sinon.stub(),
 };
 
-// Import controller & pass service
-const { profileController } = require("../../controllers")(mockService);
+// Import the controller
+const { ProfileController } = require("../../controllers");
+const profileController = new ProfileController(mockService);
 
-router.get("/:userId", profileController.getUserProfile);
-router.patch("/:userId", profileController.updateUserProfile);
+const profileRoutes = require("../../routes/api/profileRoutes")(
+  profileController
+);
 
-// Mount the controller
-app.use("/api/v1/profiles", router);
+// Mount the routes
+app.use("/api/v1/profiles", profileRoutes);
 
 describe("Profile Controller", () => {
   const profileObject = {
