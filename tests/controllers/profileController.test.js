@@ -12,7 +12,6 @@ const mockService = {
   readOneByUser: sinon.stub(),
   update: sinon.stub(),
   readOne: sinon.stub(),
-  update: sinon.stub(),
   delete: sinon.stub(),
 };
 
