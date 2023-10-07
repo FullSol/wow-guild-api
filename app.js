@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const fs = require("fs");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
+
 // Import the models
 let { User, Profile } = require("./models");
 
