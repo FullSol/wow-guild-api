@@ -105,7 +105,7 @@ class UserController extends BaseController {
         res.render("users/read", { user: response });
       else res.json(response);
     } catch (error) {
-      logger.info("user controller: get one");
+      logger.info("user controller: readById");
       logger.error(error.message);
       this._errorHandler(req, res, error);
     }
@@ -149,6 +149,13 @@ class UserController extends BaseController {
       this._errorHandler(req, res, error);
     }
   }
+
+  async connectBnet(req, res) {
+    const { userId } = req.params;
+    const { bnetAccessToken } = req.body;
+  }
+
+  async disconnectBnet(req, res) {}
 }
 
 module.exports = UserController;

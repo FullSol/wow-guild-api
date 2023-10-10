@@ -23,6 +23,10 @@ class BaseService {
     }
   };
 
+  setCreateSchema = (createSchema) => {
+    this.createSchema = createSchema;
+  };
+
   setUpdateSchema = (updateSchema) => {
     this.updateSchema = updateSchema;
   };

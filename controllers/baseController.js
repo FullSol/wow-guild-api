@@ -1,5 +1,7 @@
 "user strict";
 
+const logger = require("../logger");
+
 class BaseController {
   constructor(service) {
     this.service = service;

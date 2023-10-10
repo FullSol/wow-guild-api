@@ -31,6 +31,7 @@ const createErrorsArray = (error) => {
 };
 
 class UserService {
+  //TODO: extend the baseService
   constructor(repo) {
     this.Repo = repo;
     this.createSchema = createSchema;
@@ -83,7 +84,7 @@ class UserService {
 
   create = async (newUser) => {
     try {
-      const { username, password, repeat_password, email } = newUser;
+      const { username, password, repeatPassword, email } = newUser;
 
       // Validate the incoming data
       const { error } = this.createSchema.validate(newUser);

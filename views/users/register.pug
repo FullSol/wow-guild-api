@@ -9,8 +9,8 @@ block content
     label(for="password") Password:
     input(type="password", name="password", required)
     br
-    label(for="repeat_password") Repeat Password:
-    input(type="password", name="repeat_password", required)
+    label(for="repeatPassword") Repeat Password:
+    input(type="password", name="repeatPassword", required)
     br
     label(for="email") Email:
     input(type="email", name="email", required)
@@ -25,12 +25,12 @@ block content
       // handle submission
       const id = e.target.userId.value
       const password = e.target.password.value
-      const repeat_password = e.target.repeat_password.value
+      const repeatPassword = e.target.repeatPassword.value
       const email = e.target.email.value
 
       data = {
           password : password,
-          repeat_password : repeat_password,
+          repeatPassword : repeatPassword,
           email : email
       }
 

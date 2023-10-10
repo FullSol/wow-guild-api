@@ -53,7 +53,7 @@ describe("Profile Controller", () => {
       expect(response.body).to.deep.equal(profileObject);
     });
 
-    it("should respond with internal server error due to invalid user_id", async () => {
+    it("should respond with internal server error due to invalid userId", async () => {
       // Arrange
       mockService.readOneByUser.resolves(profileObject);
 
