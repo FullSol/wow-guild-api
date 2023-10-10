@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const fs = require("fs");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
+
 // Import the models
 let { User, Profile } = require("./models");
 
@@ -58,7 +59,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/api", limiter); // Apply to all routes under /api
+app.use("/api", limiter);
 
 // Mount the routes onto the app
 app.use("/api/v1/users", userApiRoutes(userController));

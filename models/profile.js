@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Profile.init(
     {
-      user_id: {
+      userId: {
         type: DataTypes.UUID,
         allowNull: false,
         unique: true,

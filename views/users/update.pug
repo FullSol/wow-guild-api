@@ -4,7 +4,7 @@ block content
 
     h1 Update: #{user.username}
     form(action="" id="newUserForm" method="POST")
-        input(type='hidden' name='user_id' value=`${user.id}`)
+        input(type='hidden' name='userId' value=`${user.id}`)
         label(for="password") Password:
         input(type="password", name="password", required)
         br
@@ -21,7 +21,7 @@ block content
         newUserForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             // handle submit
-            const id = e.target.user_id.value
+            const id = e.target.userId.value
             const password = e.target.password.value
             const repeat_password = e.target.repeat_password.value
             const email = e.target.email.value

@@ -180,6 +180,8 @@ class UserService {
           username: updatedUser.username,
           password: password_hash,
           email: updatedUser.email,
+          bnetId: bnetId,
+          bnetAccessToken: bnetAccessToken,
         },
         {
           where: {

@@ -29,7 +29,7 @@ app.use("/api/v1/profiles", profileRoutes);
 describe("Profile Controller", () => {
   const profileObject = {
     id: 1,
-    user_id: "1bd6cdfe-9b0c-43c2-85fd-f2ad9a1eb8d0",
+    userId: "1bd6cdfe-9b0c-43c2-85fd-f2ad9a1eb8d0",
     battle_net: "test#1234",
     createdAt: "2023-09-26T22:12:51.122Z",
     updatedAt: "2023-09-26T22:12:51.122Z",

@@ -21,7 +21,7 @@ class ProfileService extends BaseService {
         throw new Error("Valid User ID must be provided.");
 
       // Attempt to retrieve the profile from the DB
-      const profile = await this.Repo.findAll({ where: { user_id: userId } });
+      const profile = await this.Repo.findAll({ where: { userId: userId } });
 
       // Check for resource
       if (profile === null)
@@ -47,8 +47,8 @@ class ProfileService extends BaseService {
 
       // Attempt to update the resource
       const result = await this.Repo.update(
-        { battle_net: updatedProfile.battleNet, about: updatedProfile.about },
-        { where: { user_id: userId } }
+        { about: updatedProfile.about },
+        { where: { userId: userId } }
       );
 
       // Check if any rows were updated

@@ -16,7 +16,7 @@ const createSchema = Joi.object({
     "string.base": `Password should be a type of 'text'.`,
     "string.min": "Password must be at least 8 characters long",
   }),
-  repeat_password: Joi.valid(Joi.ref("password")).required(),
+  repeatPassword: Joi.valid(Joi.ref("password")).required(),
   email: Joi.string()
     .required()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
@@ -29,6 +29,11 @@ const createSchema = Joi.object({
   about: Joi.string().messages({
     "string.empty": `About cannot be empty.`,
     "string.base": `About should be a type of 'text'.`,
+  }),
+  bnetId: Joi.string().pattern(new RegExp("^[A-Za-z0-9]+#[0-9]+$")).messages({
+    "string.empty": `battle_net cannot be empty.`,
+    "string.base": `battle_net should be a type of 'text'.`,
+    "string.pattern.base": `battle_net should follow the blizzard required pattern`,
   }),
 }).options({ abortEarly: false });
 
@@ -44,11 +49,11 @@ const updateSchema = Joi.object({
     }),
     otherwise: Joi.string(),
   }),
-  new_password: Joi.string().min(8).max(30),
-  repeat_password: Joi.string()
-    .valid(Joi.ref("new_password"))
-    .when("new_password", {
-      is: Joi.exist(), // Require repeat_password when changing the password
+  newPassword: Joi.string().min(8).max(30),
+  repeatPassword: Joi.string()
+    .valid(Joi.ref("newPassword"))
+    .when("newPassword", {
+      is: Joi.exist(), // Require repeatPassword when changing the password
       then: Joi.string().required().messages({
         "any.required": `Repeat password must match the new password.`,
       }),
@@ -63,6 +68,11 @@ const updateSchema = Joi.object({
   about: Joi.string().messages({
     "string.empty": `About cannot be empty.`,
     "string.base": `About should be a type of 'text'.`,
+  }),
+  bnetId: Joi.string().pattern(new RegExp("^[A-Za-z0-9]+#[0-9]+$")).messages({
+    "string.empty": `battle_net cannot be empty.`,
+    "string.base": `battle_net should be a type of 'text'.`,
+    "string.pattern.base": `battle_net should follow the blizzard required pattern`,
   }),
 }).options({ abortEarly: false });
 

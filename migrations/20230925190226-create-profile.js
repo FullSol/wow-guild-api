@@ -9,14 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: {
+      userId: {
         type: Sequelize.UUID,
         allowNull: false,
         unique: true,
-      },
-      battle_net: {
-        type: Sequelize.STRING,
-        allowNull: true,
       },
       about: {
         type: Sequelize.TEXT,
