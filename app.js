@@ -6,28 +6,30 @@ const morgan = require("morgan");
 const fs = require("fs");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
+const passport = require("passport");
 
 // Import the models
-let { User, Profile } = require("./models");
+let { User, Profile } = require("./src/models");
 
 // Import the services
-const { UserService, ProfileService } = require("./services");
+const { UserService, ProfileService, BnetService } = require("./src/services");
 
 // Inject models into the services
 const userService = new UserService(User);
 const profileService = new ProfileService(Profile);
+const bnetService = new BnetService();
 
 // Import the controllers
-const { UserController, ProfileController } = require("./controllers/");
+const { UserController, ProfileController } = require("./src/controllers/");
 
 // Inject services into the controllers
-const userController = new UserController(userService);
+const userController = new UserController(userService, bnetService);
 const profileController = new ProfileController(profileService);
 
 // Import Routes
-const profileApiRoutes = require("./routes/api/profileRoutes");
-const userApiRoutes = require("./routes/api/userRoutes");
-const userHTMLRoutes = require("./routes/html/userRoutes");
+const profileApiRoutes = require("./src/routes/api/profileRoutes");
+const userApiRoutes = require("./src/routes/api/userRoutes");
+const baseHTMLRoutes = require("./src/routes/html/baseRoutes");
 
 const app = express();
 
@@ -60,11 +62,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", limiter);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Mount the routes onto the app
 app.use("/api/v1/users", userApiRoutes(userController));
 app.use("/api/v1/profiles", profileApiRoutes(profileController));
-app.use("/users", userHTMLRoutes(userController));
+app.use("/", baseHTMLRoutes(userController));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

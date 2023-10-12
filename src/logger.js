@@ -1,11 +1,16 @@
 const winston = require("winston");
 const DailyRotateFile = require("winston-daily-rotate-file");
 
-// Define the log format with timestamp
+// Define the log format with timestamp and stack trace
 const logFormat = winston.format.combine(
   winston.format.timestamp(),
-  winston.format.printf(({ timestamp, level, message }) => {
-    return `${timestamp} [${level}] ${message}`;
+  winston.format.printf(({ timestamp, level, message, stack }) => {
+    if (stack) {
+      // Include the stack trace if it exists
+      return `${timestamp} [${level}] ${message}\n${stack}`;
+    } else {
+      return `${timestamp} [${level}] ${message}`;
+    }
   })
 );
 

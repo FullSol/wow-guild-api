@@ -23,20 +23,21 @@ block content
       e.preventDefault();
 
       // handle submission
-      const id = e.target.userId.value
+      const username = e.target.username.value
       const password = e.target.password.value
       const repeatPassword = e.target.repeatPassword.value
       const email = e.target.email.value
 
-      data = {
+      const data = {
+          username:username,
           password : password,
           repeatPassword : repeatPassword,
           email : email
       }
 
-      const apiUrl = `http://localhost:3001/register/${id}`;
+      const apiUrl = `http://localhost:3001/api/v1/users`;
 
-      fetch (aipUrl,{
+      fetch (apiUrl,{
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -46,7 +47,7 @@ block content
       })
       .then((response) => {
           if (response.ok) {
-          window.location.href = `http://localhost:3001/login`;
+          window.location.href = `http://localhost:3001/signin`;
           }
       })
       .catch((error) => console.log(error))

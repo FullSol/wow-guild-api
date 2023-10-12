@@ -14,7 +14,9 @@ class ProfileService extends BaseService {
     super(repo, undefined, updateSchema);
   }
 
-  readOneByUser = async (userId) => {
+  create = async () => {};
+
+  read = async (userId) => {
     try {
       // Check for ID
       if (userId === null || userId === undefined)
@@ -30,8 +32,7 @@ class ProfileService extends BaseService {
       // Return the result
       return profile;
     } catch (error) {
-      this.logger.error(error.message);
-      throw error;
+      this._handleServiceError(this.constructor.name, "read", error);
     }
   };
 
@@ -59,10 +60,11 @@ class ProfileService extends BaseService {
       // Return the results
       return result;
     } catch (error) {
-      this.logger.error(error.message);
-      throw error;
+      this._handleServiceError(this.constructor.name, "update", error);
     }
   };
+
+  delete = async () => {};
 }
 
 module.exports = ProfileService;

@@ -9,7 +9,7 @@ class ProfileController extends BaseController {
   }
   async getProfile(req, res) {
     try {
-      const profile = await this.service.readOneByUser(req.params.userId);
+      const profile = await this.service.read(req.params.userId);
       res.status(200).json(profile);
     } catch (error) {
       logger.error(error.message);
