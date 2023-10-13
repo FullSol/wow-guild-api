@@ -14,8 +14,11 @@ class ProfileService extends BaseService {
     super(repo, undefined, updateSchema);
   }
 
-  create = async () => {};
-
+  /**
+   *@description Finds and returns a Profile object based on a user's id
+   * @param {string} userId
+   * @returns {Object} Profile
+   */
   read = async (userId) => {
     try {
       // Check for ID
@@ -23,11 +26,13 @@ class ProfileService extends BaseService {
         throw new Error("Valid User ID must be provided.");
 
       // Attempt to retrieve the profile from the DB
-      const profile = await this.Repo.findAll({ where: { userId: userId } });
+      const result = await this.Repo.findAll({ where: { userId: userId } });
 
       // Check for resource
-      if (profile === null)
+      if (result[0] === null)
         throw new ResourceNotFoundError("Resource not found");
+
+      const profile = result[0];
 
       // Return the result
       return profile;
@@ -36,21 +41,30 @@ class ProfileService extends BaseService {
     }
   };
 
-  update = async (userId, updatedProfile) => {
+  /**
+   * @description Updates an existing profile
+   * @param {Object} updatedProfile
+   * @returns
+   */
+  update = async (updatedProfile) => {
     try {
-      const { error } = this.updateSchema.validate(updatedProfile);
+      // Pull the userId from the object & create profileWithoutId
+      const { userId, ...profileWithoutUserId } = updatedProfile;
 
+      // validate the the profileWithoutUpdate
+      const { error } = this.updateSchema.validate(profileWithoutUserId);
+
+      // Check for validation errors
       if (error)
         throw new AggregateValidationError(
           this._createErrorsArray(error),
           "Unable to validate the profile for updating."
         );
 
-      // Attempt to update the resource
-      const result = await this.Repo.update(
-        { about: updatedProfile.about },
-        { where: { userId: userId } }
-      );
+      // Attempt to update the profile
+      const result = await this.Repo.update(profileWithoutUserId, {
+        where: { userId: userId },
+      });
 
       // Check if any rows were updated
       if (result[0] === 0) {
@@ -63,8 +77,6 @@ class ProfileService extends BaseService {
       this._handleServiceError(this.constructor.name, "update", error);
     }
   };
-
-  delete = async () => {};
 }
 
 module.exports = ProfileService;

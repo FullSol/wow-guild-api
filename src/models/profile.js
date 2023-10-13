@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // this.belongsTo(models.User);
+      this.belongsTo(models.User);
     }
   }
   Profile.init(
@@ -19,12 +19,28 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-      battle_net: {
+      about: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      bnetHandle: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      about: {
-        type: DataTypes.TEXT,
+      twitterHandle: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      facebookHandle: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      discordHandle: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      youtubeHandle: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
     },

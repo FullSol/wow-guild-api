@@ -1,11 +1,8 @@
 "use strict";
 
 const { ResourceNotFoundError } = require("../errors/custom");
-const logger = require("../logger");
 const BaseController = require("./baseController");
 const { CreateUserDTO, UpdateUserDTO, LoginDTO, UserDTO } = require("../dtos/");
-const regexExp =
-  /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}(?:\/.*)?$/i;
 
 class UserController extends BaseController {
   constructor(service, bnetService) {
@@ -15,14 +12,14 @@ class UserController extends BaseController {
 
   async authenticate(req, res) {
     try {
-      // Pul the required fields from the body
+      // Pull the required fields from the body
       const { username, password } = req.body;
 
       // Create a DTO
-      const userDTO = new UserDTO(username, password);
+      const credentialsDTO = new LoginDTO(username, password);
 
       // Attempt to authenticate the user
-      const result = await this.service.authenticate(userDTO);
+      const result = await this.service.authenticate(credentialsDTO);
 
       // Create a DTO of the user (without the password)
       const user = new UserDTO(
@@ -39,24 +36,31 @@ class UserController extends BaseController {
       // Return the status and user to the client
       res.status(200).json(user);
     } catch (error) {
-      logger.info("index controller: login");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "authenticate",
+        error
+      );
     }
   }
 
-  async logout(req, res) {
+  async signout(req, res) {
     try {
-      console.log(req.session);
-      logger.info(`${req.session.user} has logged out.`);
-      req.session.destroy;
-      const acceptedHeader = req.get("Accept").split(",");
-      if (acceptedHeader[0] === "text/html") res.redirect("/");
-      else res.send("User has been logged out");
+      // Destroy the session
+      req.session.destroy();
+
+      // Notify client
+      res.send("User has been logged out");
     } catch (error) {
-      logger.info("index controller: logout");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "signout",
+        error
+      );
     }
   }
 
@@ -76,73 +80,107 @@ class UserController extends BaseController {
       // Attempt to create a new user
       const result = await this.service.create(newUser);
 
-      // Create DTO to send back to user
+      // Create DTO to send back to the client
       const userDTO = new UserDTO(result.id, result.username, result.email);
 
       // Send response
       res.status(201).json(userDTO);
     } catch (error) {
-      logger.info("user controller: create");
-      logger.error(error);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "create",
+        error
+      );
     }
   }
 
   async readAll(req, res) {
     try {
+      // Attempt to retrieve all users
       const response = await this.service.readAll();
-      res.status(200);
-      const acceptedHeader = req.get("Accept").split(",");
-      if (acceptedHeader[0] === "text/html")
-        res.render("users/readAll", { users: response });
-      else res.json(response);
-      return res;
+
+      // Create array of DTOs for each user in the response
+      const users = response.map((user) => {
+        return new UserDTO(user.id, user.username, user.email);
+      });
+
+      // Send response
+      res.status(200).json(users);
     } catch (error) {
-      logger.info("user controller: get all");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "readAll",
+        error
+      );
     }
   }
 
   async readById(req, res) {
     try {
+      // Pull the id from the params
       const { userId } = req.params;
-      if (userId === null || !regexExp.test(userId))
+
+      // Check for valid user id
+      if (userId === null || userId === undefined)
         throw new ResourceNotFoundError("Valid user id is required");
 
-      const response = await this.service.read(userId);
-      const acceptedHeader = req.get("Accept").split(",");
+      // Attempt to retrieve the user
+      const result = await this.service.read(userId);
 
-      res.status(200);
+      // Check for null results
+      if (result === null)
+        throw new ResourceNotFoundError("Resource not found");
 
-      if (acceptedHeader[0] === "text/html")
-        res.render("users/read", { user: response });
-      else res.json(response);
+      // Create DTO to send back to client
+      const user = new UserDTO(
+        result.id,
+        result.username,
+        result.email,
+        result.bnetId
+      );
+
+      // Send user back to the client
+      res.status(200).json(user);
     } catch (error) {
-      logger.info("user controller: readById");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "readById",
+        error
+      );
     }
   }
 
   async readByUsername(req, res) {
     try {
+      // Pull required property form the params
       const { userName } = req.params;
+
+      // Check for valid username
       if (userName === null)
         throw new ResourceNotFoundError("Valid username is required");
 
-      const response = await this.service.read(userName);
-      const acceptedHeader = req.get("Accept").split(",");
+      // Attempt to retrieve the user
+      const result = await this.service.read(userName);
 
-      res.status(200);
+      // Create DTO to send back to client
+      const user = new UserDTO(result.id, result.username, result.email);
 
-      if (acceptedHeader[0] === "text/html")
-        res.render("users/read", { user: response });
-      else res.json(response);
+      // Send user back to the client
+      res.status(200).json(user);
     } catch (error) {
-      logger.info("user controller: readById");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "readByUsername",
+        error
+      );
     }
   }
 
@@ -152,44 +190,36 @@ class UserController extends BaseController {
       const { id } = req.session.user;
 
       // Retrieve update fields from the req
-      const {
-        username,
-        newPassword,
-        repeatPassword,
-        email,
-        bnetId,
-        bnetAccessToken,
-      } = req.body;
+      const { username, newPassword, repeatPassword, email, bnetAccessToken } =
+        req.body;
 
       // Create a UpdateDTO
       const updateUserDTO = new UpdateUserDTO(
-        userId,
+        id,
         username,
         newPassword,
         repeatPassword,
         email,
-        bnetId,
         bnetAccessToken
       );
 
       // Attempt to update the user
       const result = await this.service.update(updateUserDTO);
 
-      // Create DTO to return the data
-      const user = new UserDTO(
-        result.id,
-        result.username,
-        result.email,
-        result.bnetId,
-        result.bnetAccessToken
-      );
+      // Handle no user
+      if (result[0] === 0)
+        throw new ResourceNotFoundError("Resource not found");
 
-      // Set the response status and the updated user
-      res.status(200).json(user);
+      // Send success response to client
+      res.status(200).send("User successfully updated");
     } catch (error) {
-      logger.info("user controller: patch");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "update",
+        error
+      );
     }
   }
 
@@ -199,16 +229,22 @@ class UserController extends BaseController {
       const { id } = req.session.user;
 
       // Attempt to delete the user
-      const result = await this.service.delete(userId, req.body);
+      const result = await this.service.delete(id);
 
       // Check to ensure successful deletion and respond appropriately
       if (result === 0)
-        res.status(404).send({ message: "no resource found for deletion." });
-      else res.status(200).json(result);
+        throw new ResourceNotFoundError("Unable to delete user.");
+
+      // Send successful deletion message
+      res.status(200).send("User successfully deleted");
     } catch (error) {
-      logger.info("user controller: delete");
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "delete",
+        error
+      );
     }
   }
 

@@ -6,8 +6,6 @@ const {
   createSchema,
   updateSchema,
 } = require("../validations/userValidations");
-const regexExp =
-  /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}(?:\/.*)?$/i;
 
 const {
   AggregateValidationError,
@@ -56,7 +54,7 @@ class UserService extends BaseService {
       // Return the store user - this still the password!
       return storedUser;
     } catch (error) {
-      this._handleServiceError("user", "authenticate", error);
+      this._handleServiceError(this.constructor.name, "authenticate", error);
     }
   };
 
@@ -96,15 +94,11 @@ class UserService extends BaseService {
   read = async (id) => {
     try {
       // Check for valid id
-      if (id === null || !regexExp.test(id))
+      if (id === null || id === undefined)
         throw new ResourceNotFoundError("Valid user id required");
 
       // Attempt to retrieve information from the DB
       const result = await this.Repo.findByPk(id);
-
-      // Check for null results
-      if (result === null)
-        throw new ResourceNotFoundError("Resource not found");
 
       // Return the results
       return result;
@@ -128,14 +122,10 @@ class UserService extends BaseService {
   update = async (updateUserDTO) => {
     try {
       // Pull required fields from DTO
-      const { id } = updateUserDTO;
-
-      // Check for valid id
-      if (id === null || !regexExp.test(id))
-        throw new ResourceNotFoundError("Valid user id is required");
+      const { id, ...userDTOWithoutId } = updateUserDTO;
 
       // validate the incoming data
-      const { error } = this.updateSchema.validate(updatedUser);
+      const { error } = this.updateSchema.validate(userDTOWithoutId);
 
       // If there was a validation error throw a validation error with error message
       if (error)
@@ -146,17 +136,19 @@ class UserService extends BaseService {
 
       // if the password is being updated hash it
       let password_hash;
-      if (updateUserDTO.password) {
-        password_hash = await bcrypt.hash(updateUserDTO.password, saltRounds);
+      if (userDTOWithoutId.password) {
+        password_hash = await bcrypt.hash(
+          userDTOWithoutId.password,
+          saltRounds
+        );
       }
 
       // UserDTO with hashed password
       const userWithHashedPassword = {
-        username: updateUserDTO.username,
+        username: userDTOWithoutId.username,
         password: password_hash,
-        email: updateUserDTO.email,
-        bnetId: updateUserDTO.bnetId,
-        bnetAccessToken: updateUserDTO.bnetAccessToken,
+        email: userDTOWithoutId.email,
+        bnetAccessToken: userDTOWithoutId.bnetAccessToken,
       };
 
       // Attempt to update information in the DB
@@ -165,9 +157,6 @@ class UserService extends BaseService {
           id: id,
         },
       });
-
-      if (result[0] === 0)
-        throw new ResourceNotFoundError("Resource not found");
 
       // Return the results
       return result;
@@ -178,12 +167,8 @@ class UserService extends BaseService {
 
   delete = async (id) => {
     try {
-      // Check for valid id
-      if (id === null || !regexExp.test(id))
-        throw new ResourceNotFoundError("Valid user id is required");
-
       // Attempt to delete information from the DB
-      const result = this.Repo.destroy({ where: { id: id } });
+      const result = await this.Repo.destroy({ where: { id: id } });
 
       // Return the results
       return result;

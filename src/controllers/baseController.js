@@ -7,8 +7,15 @@ class BaseController {
     this.service = service;
   }
 
-  _errorHandler(req, res, error) {
+  _handleControllerError(req, res, controllerName, methodName, error) {
+    // Log the error
+    logger.info(`${controllerName}: ${methodName}`);
+    logger.error(error);
+
+    // Pull errors array from the error if exists
     const { errors } = error;
+
+    // Handle the errors
     switch (error.name) {
       case "ValidationError":
         res.status(400).send({

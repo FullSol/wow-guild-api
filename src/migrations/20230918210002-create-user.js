@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      bnetId: {
+      bnetAccessToken: {
         type: Sequelize.STRING,
         allowNull: true,
       },

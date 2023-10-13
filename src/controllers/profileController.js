@@ -1,7 +1,7 @@
 "use strict";
 
-const logger = require("../logger");
 const BaseController = require("./baseController");
+const { ProfileDTO, UpdateProfileDTO } = require("../dtos/profile");
 
 class ProfileController extends BaseController {
   constructor(service) {
@@ -9,23 +9,81 @@ class ProfileController extends BaseController {
   }
   async getProfile(req, res) {
     try {
-      const profile = await this.service.read(req.params.userId);
+      // Pull the userId from the req.params
+      const { userId } = req.params;
+
+      // Attempt to retrieve the profile
+      const result = await this.service.read(userId);
+
+      // Create DTO to send back to the client
+      const profile = new ProfileDTO(
+        result.id,
+        result.userId,
+        result.about,
+        result.bnetHandle,
+        result.twitterHandle,
+        result.facebookHandle,
+        result.discordHandle,
+        result.youtubeHandle,
+        result.createdAt,
+        result.updatedAt
+      );
+
+      // Send response
       res.status(200).json(profile);
     } catch (error) {
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "getProfile",
+        error
+      );
     }
   }
 
   async updateProfile(req, res) {
     try {
-      const { userId } = req.params;
-      if (userId === null) throw new Error("invalid ID request");
-      await this.service.update(userId, req.body);
+      // Pull the userId from the session
+      const { id } = req.session.user;
+
+      // Check if the ID is somehow not set
+      if (id === null) throw new Error("Please sign in");
+
+      // Pull the expected fields from the body
+      const {
+        about,
+        bnetHandle,
+        twitterHandle,
+        facebookHandle,
+        discordHandle,
+        youtubeHandle,
+      } = req.body;
+
+      // Create an updateProfileDTO
+      const updateProfileDTO = new UpdateProfileDTO(
+        id,
+        about,
+        bnetHandle,
+        twitterHandle,
+        facebookHandle,
+        discordHandle,
+        youtubeHandle
+      );
+
+      // Attempt to update the profile
+      await this.service.update(updateProfileDTO);
+
+      // Send successful response to the client
       res.status(200).send("User profile successfully updated.");
     } catch (error) {
-      logger.error(error.message);
-      this._errorHandler(req, res, error);
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "updateProfile",
+        error
+      );
     }
   }
 }

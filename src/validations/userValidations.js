@@ -30,11 +30,6 @@ const createSchema = Joi.object({
     "string.empty": `About cannot be empty.`,
     "string.base": `About should be a type of 'text'.`,
   }),
-  bnetId: Joi.string().pattern(new RegExp("^[A-Za-z0-9]+#[0-9]+$")).messages({
-    "string.empty": `battle_net cannot be empty.`,
-    "string.base": `battle_net should be a type of 'text'.`,
-    "string.pattern.base": `battle_net should follow the blizzard required pattern`,
-  }),
 }).options({ abortEarly: false });
 
 const updateSchema = Joi.object({
@@ -69,10 +64,9 @@ const updateSchema = Joi.object({
     "string.empty": `About cannot be empty.`,
     "string.base": `About should be a type of 'text'.`,
   }),
-  bnetId: Joi.string().pattern(new RegExp("^[A-Za-z0-9]+#[0-9]+$")).messages({
-    "string.empty": `battle_net cannot be empty.`,
-    "string.base": `battle_net should be a type of 'text'.`,
-    "string.pattern.base": `battle_net should follow the blizzard required pattern`,
+  bnetAccessToken: Joi.string().messages({
+    "string.empty": `bnetAccessToken cannot be empty.`,
+    "string.base": `bnetAccessToken should be a type of 'text'.`,
   }),
 }).options({ abortEarly: false });
 

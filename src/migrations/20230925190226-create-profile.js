@@ -13,9 +13,35 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         unique: true,
+        references: {
+          model: "Users", // name of Target model
+          key: "id", // key in Target model that we're referencing
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       about: {
         type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      bnetHandle: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      twitterHandle: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      facebookHandle: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      discordHandle: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      youtubeHandle: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       createdAt: {

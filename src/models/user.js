@@ -9,7 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.hasOne(models.Profile, { foreignKey: "userId" });
+      this.hasOne(models.Profile, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
     }
   }
   User.init(
@@ -43,15 +46,13 @@ module.exports = (sequelize, DataTypes) => {
           notNull: true,
         },
       },
-      bnetId: {
+      bnetAccessToken: {
         type: DataTypes.STRING,
-        allowNull: true,
       },
-      bnetAccessToken: { type: String },
     },
     {
       hooks: {
-        beforeCreate: async (user) => {
+        afterCreate: async (user) => {
           // Create a profile for the user before creating the user
           const profile = await sequelize.models.Profile.create({
             userId: user.id,

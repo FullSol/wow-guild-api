@@ -4,7 +4,6 @@ class UserDTO {
     this.username = username;
     this.email = email;
     this.bnetId = bnetId;
-    this.bnetAccessToken = bnetAccessToken;
   }
 }
 
