@@ -10,6 +10,10 @@ class UserController extends BaseController {
     this.bnetService = bnetService;
   }
 
+  async signinForm(req, res) {
+    res.render("users/signin");
+  }
+
   async authenticate(req, res) {
     try {
       // Pull the required fields from the body
@@ -129,7 +133,7 @@ class UserController extends BaseController {
         throw new ResourceNotFoundError("Valid user id is required");
 
       // Attempt to retrieve the user
-      const result = await this.service.read(userId);
+      const result = await this.service.readById(userId);
 
       // Check for null results
       if (result === null)
@@ -159,14 +163,18 @@ class UserController extends BaseController {
   async readByUsername(req, res) {
     try {
       // Pull required property form the params
-      const { userName } = req.params;
+      const { username } = req.params;
 
       // Check for valid username
-      if (userName === null)
+      if (username === null)
         throw new ResourceNotFoundError("Valid username is required");
 
       // Attempt to retrieve the user
-      const result = await this.service.read(userName);
+      const result = await this.service.readByUsername(username);
+
+      // Check for null results
+      if (result === null)
+        throw new ResourceNotFoundError("Resource not found");
 
       // Create DTO to send back to client
       const user = new UserDTO(result.id, result.username, result.email);

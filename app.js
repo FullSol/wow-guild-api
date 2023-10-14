@@ -29,7 +29,7 @@ const profileController = new ProfileController(profileService);
 // Import Routes
 const profileApiRoutes = require("./src/routes/api/profileRoutes");
 const userApiRoutes = require("./src/routes/api/userRoutes");
-const baseHTMLRoutes = require("./src/routes/html/baseRoutes");
+const userHTMLRoutes = require("./src/routes/html/userRoutes");
 
 const app = express();
 
@@ -68,7 +68,7 @@ app.use(passport.session());
 // Mount the routes onto the app
 app.use("/api/v1/users", userApiRoutes(userController));
 app.use("/api/v1/profiles", profileApiRoutes(profileController));
-app.use("/", baseHTMLRoutes(userController));
+app.use("/", userHTMLRoutes(userController));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

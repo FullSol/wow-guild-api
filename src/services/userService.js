@@ -91,12 +91,8 @@ class UserService extends BaseService {
     }
   };
 
-  read = async (id) => {
+  readById = async (id) => {
     try {
-      // Check for valid id
-      if (id === null || id === undefined)
-        throw new ResourceNotFoundError("Valid user id required");
-
       // Attempt to retrieve information from the DB
       const result = await this.Repo.findByPk(id);
 
@@ -105,6 +101,14 @@ class UserService extends BaseService {
     } catch (error) {
       this._handleServiceError(this.constructor.name, "read", error);
     }
+  };
+
+  readByUsername = async (username) => {
+    // Attempt to retrieve information from the DB
+    const result = await this.Repo.findAll({ where: { username: username } });
+
+    // Return the results
+    return result[0];
   };
 
   readAll = async () => {

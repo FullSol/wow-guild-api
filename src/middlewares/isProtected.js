@@ -10,7 +10,7 @@ const isProtected = (req, res, next) => {
       res.status(401).json({ error: "Unauthorized: Please log in." });
     } else {
       // Redirect to the sign-in page for other requests
-      res.redirect("http://localhost:3001/signin");
+      res.redirect("http://localhost:3001/api/v1/users/signin");
     }
   }
 };
