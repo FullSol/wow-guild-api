@@ -36,7 +36,7 @@ Backend for wings-guild website
    - Keep logs of recruitment activities, applications, and outcomes.
    - Assist officers in tracking and evaluating potential recruits.
 10. Guides and Resources:
-    - reate guides and resources for raid strategies, class guides, and profession tips.
+    - Relate guides and resources for raid strategies, class guides, and profession tips.
     - Allow members to contribute their own guides and share knowledge.
 11. Integration with WoW API:
     - Integrate with the WoW API to automatically fetch and display character information.
