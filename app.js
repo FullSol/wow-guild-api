@@ -6,30 +6,14 @@ const morgan = require("morgan");
 const fs = require("fs");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
-const passport = require("passport");
-
-// Import the models
-let { User, Profile } = require("./src/models");
-
-// Import the services
-const { UserService, ProfileService, BnetService } = require("./src/services");
-
-// Inject models into the services
-const userService = new UserService(User);
-const profileService = new ProfileService(Profile);
-const bnetService = new BnetService();
-
-// Import the controllers
-const { UserController, ProfileController } = require("./src/controllers/");
-
-// Inject services into the controllers
-const userController = new UserController(userService, bnetService);
-const profileController = new ProfileController(profileService);
-
-// Import Routes
-const profileApiRoutes = require("./src/routes/api/profileRoutes");
-const userApiRoutes = require("./src/routes/api/userRoutes");
-const userHTMLRoutes = require("./src/routes/html/userRoutes");
+const passport = require("./src/config/passport");
+const cors = require("cors");
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true, // Enable credentials
+};
+const apiRoutes = require("./src/routes/api");
+const isProtected = require("./src/middlewares/isProtected");
 
 const app = express();
 
@@ -43,6 +27,9 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
 });
 
+app.options("/api/v1/users/signin", cors(corsOptions));
+app.options("/auth/bnet", cors(corsOptions));
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -53,22 +40,37 @@ app.use(
     secret: "this-is-the-song-that-never-ends",
     resave: false, // Save session only if it has been modified
     saveUninitialized: false, // No session for unauthenticated
+    cookie: {
+      httpOnly: true,
+    },
   })
 );
-
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", limiter);
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cors());
 
 // Mount the routes onto the app
-app.use("/api/v1/users", userApiRoutes(userController));
-app.use("/api/v1/profiles", profileApiRoutes(profileController));
-app.use("/", userHTMLRoutes(userController));
+app.use("/api/v1", apiRoutes);
+
+// bnet auth
+const uniqueValue = Math.random().toString(36).substring(7);
+app.get("/auth/bnet", passport.authenticate("bnet", { state: uniqueValue }));
+
+// bnet callback
+app.get(
+  "/auth/bnet/callback",
+  isProtected,
+  passport.authenticate("bnet", { failureRedirect: "/" }),
+  function (req, res) {
+    res.redirect("http://localhost:3000/");
+  }
+);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

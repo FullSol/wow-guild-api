@@ -37,6 +37,12 @@ class BaseController {
           message: error.message,
         });
         break;
+      case "AuthenticationFailureError":
+        res.status(401).send({
+          status: "Unauthorized",
+          message: "Username or password not recognized",
+        });
+        break;
       default:
         res
           .status(500)

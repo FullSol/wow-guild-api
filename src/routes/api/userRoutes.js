@@ -2,7 +2,6 @@
 
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const isProtected = require("../../middlewares/isProtected");
 
 module.exports = (controller) => {
@@ -29,18 +28,6 @@ module.exports = (controller) => {
 
   // Route for deleting a user by userId
   router.delete("/:userId", controller.delete.bind(controller));
-
-  // Route to authenticate user on bnet
-  router.get("/auth/bnet", controller.authBnet.bind(controller));
-
-  // Route for bnet callback
-  router.get(
-    "/auth/bnet/callback",
-    passport.authenticate("bnet", { failureRedirect: "/" }),
-    function (req, res) {
-      res.redirect("/");
-    }
-  );
 
   return router;
 };

@@ -1,5 +1,5 @@
 const UserService = require("./userService");
 const ProfileService = require("./profileService");
-const BnetService = require("./bnetService");
+// const BnetService = require("./bnetService");
 
-module.exports = { UserService, ProfileService, BnetService };
+module.exports = { UserService, ProfileService };

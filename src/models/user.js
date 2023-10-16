@@ -46,8 +46,13 @@ module.exports = (sequelize, DataTypes) => {
           notNull: true,
         },
       },
+      bnetId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       bnetAccessToken: {
         type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {

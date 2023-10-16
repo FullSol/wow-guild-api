@@ -22,6 +22,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      bnetId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       bnetAccessToken: {
         type: Sequelize.STRING,
         allowNull: true,

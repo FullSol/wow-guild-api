@@ -9,7 +9,6 @@ const {
 
 const {
   AggregateValidationError,
-  ResourceNotFoundError,
   AuthenticationFailureError,
 } = require("../errors/custom");
 const BaseService = require("./baseService");
@@ -18,45 +17,6 @@ class UserService extends BaseService {
   constructor(repo) {
     super(repo, createSchema, updateSchema);
   }
-
-  authenticate = async (credentials) => {
-    try {
-      // Pull the required field from credentials
-      const { username, password } = credentials;
-
-      // Retrieve the user from the DB based on the username alone
-      const users = await this.Repo.scope("withPassword").findAll({
-        where: {
-          username: username,
-        },
-      });
-
-      // Check if a user with the provided username exists
-      if (users.length === 0) {
-        throw new AuthenticationFailureError(
-          "Username or Password not recognized"
-        );
-      }
-
-      // Pull the user from the array
-      const storedUser = users[0];
-
-      // Compare the provided password with the stored hash
-      const isMatch = await bcrypt.compare(password, storedUser.password);
-
-      // Ensure the password matched
-      if (!isMatch) {
-        throw new AuthenticationFailureError(
-          "Username or Password not recognized"
-        );
-      }
-
-      // Return the store user - this still the password!
-      return storedUser;
-    } catch (error) {
-      this._handleServiceError(this.constructor.name, "authenticate", error);
-    }
-  };
 
   create = async (userDTO) => {
     try {
@@ -179,6 +139,52 @@ class UserService extends BaseService {
     } catch (error) {
       this._handleServiceError(this.constructor.name, "delete", error);
     }
+  };
+
+  authenticate = async (credentials) => {
+    try {
+      // Pull the required field from credentials
+      const { username, password } = credentials;
+
+      // Retrieve the user from the DB based on the username alone
+      const users = await this.Repo.scope("withPassword").findAll({
+        where: {
+          username: username,
+        },
+      });
+
+      // Check if a user with the provided username exists
+      if (users.length === 0) {
+        throw new AuthenticationFailureError(
+          "Username or Password not recognized"
+        );
+      }
+
+      // Pull the user from the array
+      const storedUser = users[0];
+
+      // Compare the provided password with the stored hash
+      const isMatch = await bcrypt.compare(password, storedUser.password);
+
+      // Ensure the password matched
+      if (!isMatch) {
+        throw new AuthenticationFailureError(
+          "Username or Password not recognized"
+        );
+      }
+
+      // Return the store user - this still the password!
+      return storedUser;
+    } catch (error) {
+      this._handleServiceError(this.constructor.name, "authenticate", error);
+    }
+  };
+
+  authBnet = () => {
+    try {
+      console.log(this.constructor.name + ": bnetAuth");
+      return "getting there";
+    } catch (error) {}
   };
 }
 

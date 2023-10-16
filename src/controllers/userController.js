@@ -5,13 +5,8 @@ const BaseController = require("./baseController");
 const { CreateUserDTO, UpdateUserDTO, LoginDTO, UserDTO } = require("../dtos/");
 
 class UserController extends BaseController {
-  constructor(service, bnetService) {
+  constructor(service) {
     super(service);
-    this.bnetService = bnetService;
-  }
-
-  async signinForm(req, res) {
-    res.render("users/signin");
   }
 
   async authenticate(req, res) {
@@ -36,6 +31,10 @@ class UserController extends BaseController {
 
       // Store the user information in the session
       req.session.user = user;
+
+      // Set response headers [cors is annoying]
+      res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
 
       // Return the status and user to the client
       res.status(200).json(user);
@@ -254,25 +253,6 @@ class UserController extends BaseController {
         error
       );
     }
-  }
-
-  async authBnet(req, res) {
-    // Redirect the user to Blizzard for authentication
-    const bnet = this.bnetService.authenticate(req, res);
-    console.log(bnet);
-  }
-
-  async connectBnet(req, res) {
-    const { userId } = req.params;
-    const { bnetAccessToken } = req.body;
-
-    // Call the connectBnet method in your BnetService
-    this.bnetService.connectBnet(userId, bnetAccessToken);
-  }
-
-  async disconnectBnet(req, res) {
-    // Call the disconnectBnet method in your BnetService
-    this.bnetService.disconnectBnet(req.params.userId);
   }
 }
 
