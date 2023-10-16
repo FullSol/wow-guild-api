@@ -15,7 +15,7 @@ describe("User Validations", () => {
       const validJsonObject = {
         username: "JamesBond99",
         password: "password",
-        repeat_password: "password",
+        repeatPassword: "password",
         email: "jb@gmail.com",
         about: "The real secret agent",
       };
@@ -29,12 +29,12 @@ describe("User Validations", () => {
 
     //TODO: Test the pattern
 
-    it("should not validate for mismatched password and repeat_password", () => {
+    it("should not validate for mismatched password and repeatPassword", () => {
       // Arrange
       const invalidRepeatPassword = {
         username: "JamesBond99",
         password: "password",
-        repeat_password: "password-mismatch",
+        repeatPassword: "password-mismatch",
         email: "jb@gmail.com",
         about: "The real secret agent",
       };
@@ -53,7 +53,7 @@ describe("User Validations", () => {
       const invalidPasswordObject = {
         username: "test1",
         password: "12",
-        repeat_password: "12",
+        repeatPassword: "12",
         email: "test1@gmail.com",
         about: "It's me, Mario",
       };
@@ -73,7 +73,7 @@ describe("User Validations", () => {
       const invalidPasswordObject = {
         username: "JamesBond99",
         password: "1234567890123456789012345678901",
-        repeat_password: "1234567890123456789012345678901",
+        repeatPassword: "1234567890123456789012345678901",
         email: "jb@gmail.com",
         about: "The real secret agent",
       };
@@ -93,7 +93,7 @@ describe("User Validations", () => {
       const invalidData = {
         username: "",
         password: "",
-        repeat_password: "",
+        repeatPassword: "",
         email: "",
         about: "",
       };
@@ -113,7 +113,7 @@ describe("User Validations", () => {
       const invalidData = {
         username: true,
         password: true,
-        repeat_password: true,
+        repeatPassword: true,
         email: true,
         about: true,
       };
@@ -147,7 +147,7 @@ describe("User Validations", () => {
       const invalidEmail = {
         username: "JamesBond99",
         password: "password",
-        repeat_password: "password",
+        repeatPassword: "password",
         email: "not-an-email",
         about: "The real secret agent",
       };
@@ -183,8 +183,8 @@ describe("User Validations", () => {
     it("should validate for password change", () => {
       // Arrange
       const validPasswordChange = {
-        new_password: "password2",
-        repeat_password: "password2",
+        newPassword: "password2",
+        repeatPassword: "password2",
       };
 
       // Act
@@ -194,11 +194,11 @@ describe("User Validations", () => {
       expect(result.error).to.be.undefined;
     });
 
-    it("should not validate for mismatched new_password and repeat_password", () => {
+    it("should not validate for mismatched newPassword and repeatPassword", () => {
       // Arrange
       const invalidRepeatPassword = {
-        new_password: "password",
-        repeat_password: "password-mismatch",
+        newPassword: "password",
+        repeatPassword: "password-mismatch",
       };
 
       // Act
@@ -213,8 +213,8 @@ describe("User Validations", () => {
     it("should not validate password less than 3 characters", async () => {
       // Arrange
       const invalidPasswordObject = {
-        new_password: "12",
-        repeat_password: "12",
+        newPassword: "12",
+        repeatPassword: "12",
       };
 
       // Act
@@ -230,8 +230,8 @@ describe("User Validations", () => {
     it("should not validate password more than 30 characters", async () => {
       // Arrange
       const invalidPasswordObject = {
-        new_password: "1234567890123456789012345678901",
-        repeat_password: "1234567890123456789012345678901",
+        newPassword: "1234567890123456789012345678901",
+        repeatPassword: "1234567890123456789012345678901",
       };
 
       // Act
@@ -245,10 +245,10 @@ describe("User Validations", () => {
       });
     });
 
-    it("should require repeat_password when new_password is present", () => {
+    it("should require repeatPassword when newPassword is present", () => {
       //Arrange
       const invalidPasswordChange = {
-        new_password: "password2",
+        newPassword: "password2",
       };
 
       const result = updateSchema.validate(invalidPasswordChange);
@@ -265,7 +265,7 @@ describe("User Validations", () => {
       const invalidData = {
         username: "",
         password: "",
-        repeat_password: "",
+        repeatPassword: "",
         email: "",
         about: "",
       };
@@ -285,7 +285,7 @@ describe("User Validations", () => {
       const invalidData = {
         username: true,
         password: true,
-        repeat_password: true,
+        repeatPassword: true,
         email: true,
         about: true,
       };

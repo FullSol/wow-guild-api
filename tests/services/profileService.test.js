@@ -9,7 +9,7 @@ describe("Profile Service", () => {
 
   const profileObject = {
     id: 1,
-    user_id: "550e8400-e29b-41d4-a716-446655440000",
+    userId: "550e8400-e29b-41d4-a716-446655440000",
     battle_net: "user-battle-net",
     createdAt: new Date(),
     updatedAt: new Date(),

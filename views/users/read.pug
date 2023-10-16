@@ -1,5 +1,14 @@
 extends ../layout
 
-block content
-    h1 #{user.username}
-    p User id: #{user.id}
+block content 
+    h2 #{user.username}
+    p user id: #{user.id}
+    button(
+        type='button' onclick='redirect()'
+    ) Connect BNET Account
+
+    script.
+        redirect = () =>{
+             window.location.href = `http://localhost:3001/api/v1/users/auth/bnet`;
+        };
+
