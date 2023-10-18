@@ -64,6 +64,10 @@ const updateSchema = Joi.object({
     "string.empty": `About cannot be empty.`,
     "string.base": `About should be a type of 'text'.`,
   }),
+  bnetId: Joi.number().messages({
+    "integer.empty": `bnetId cannot be empty.`,
+    "integer.base": `bnetId should be a type of 'number'.`,
+  }),
   bnetAccessToken: Joi.string().messages({
     "string.empty": `bnetAccessToken cannot be empty.`,
     "string.base": `bnetAccessToken should be a type of 'text'.`,

@@ -29,5 +29,14 @@ module.exports = (controller) => {
   // Route for deleting a user by userId
   router.delete("/:userId", controller.delete.bind(controller));
 
+  // Route to authenticate bnet
+  router.get("/auth/bnet", controller.authBnet.bind(controller));
+
+  // Route for bnet auth callback
+  router.get(
+    "auth/bnet/callback",
+    controller.authBnetCallback.bind(controller)
+  );
+
   return router;
 };
