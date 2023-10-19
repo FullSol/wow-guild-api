@@ -17,6 +17,12 @@ module.exports = (controller) => {
   // Route for retrieving user information by userId
   router.get("/:userId", controller.readById.bind(controller));
 
+  // Route for bnet auth callback
+  router.get(
+    "auth/bnet/callback",
+    controller.authBnetCallback.bind(controller)
+  );
+
   // Enable protection for all routes below this line
   router.use(isProtected);
 
@@ -31,12 +37,6 @@ module.exports = (controller) => {
 
   // Route to authenticate bnet
   router.get("/auth/bnet", controller.authBnet.bind(controller));
-
-  // Route for bnet auth callback
-  router.get(
-    "auth/bnet/callback",
-    controller.authBnetCallback.bind(controller)
-  );
 
   return router;
 };

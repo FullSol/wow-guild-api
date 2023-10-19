@@ -30,7 +30,6 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-        console.log("TRYing");
         // Pull the id from the session
         const { id } = req.session.user;
 
@@ -91,6 +90,7 @@ passport.use(
         // Wrap up the passport strategy
         return done(null, user);
       } catch (error) {
+        console.log(error);
         return done(error, null);
       }
     }
@@ -98,10 +98,12 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
+  console.log("serializing");
   done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
+  console.log("deserialize");
   try {
     const user = await User.findByPk(id);
     done(null, user);
@@ -112,6 +114,7 @@ passport.deserializeUser(async (id, done) => {
 
 // Function to fetch user characters from Battle.net API
 async function fetchUserCharacters(accessToken) {
+  console.log("fetching characters");
   try {
     // Region for Blizzard request
     const region = "us";

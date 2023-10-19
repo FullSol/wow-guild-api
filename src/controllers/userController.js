@@ -29,13 +29,9 @@ class UserController extends BaseController {
         bnetId: result.bnetId,
         bnetAccessToken: result.bnetAccessToken,
       };
-      console.log("User authenticated:", user);
+
       // Store the user information in the session
       req.session.user = user;
-
-      // Set response headers [cors is annoying]
-      // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-      // res.setHeader("Access-Control-Allow-Credentials", "true");
 
       // Return the status and user to the client
       res.status(200).json(user);
@@ -257,10 +253,10 @@ class UserController extends BaseController {
   }
 
   async authBnet(req, res) {
-    console.log(req);
     console.log("controller is being called");
     const uniqueValue = Math.random().toString(36).substring(7);
-    this.passport.authenticate("bnet", { state: uniqueValue });
+    await this.passport.authenticate("bnet", { state: uniqueValue });
+    console.log("controller end");
   }
 
   async authBnetCallback(req, res) {
