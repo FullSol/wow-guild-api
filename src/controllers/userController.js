@@ -5,8 +5,9 @@ const BaseController = require("./baseController");
 const { CreateUserDTO, UpdateUserDTO, LoginDTO, UserDTO } = require("../dtos/");
 
 class UserController extends BaseController {
-  constructor(service) {
+  constructor(service, passport) {
     super(service);
+    this.passport = passport;
   }
 
   async authenticate(req, res) {
@@ -21,20 +22,16 @@ class UserController extends BaseController {
       const result = await this.service.authenticate(credentialsDTO);
 
       // Create a DTO of the user (without the password)
-      const user = new UserDTO(
-        result.id,
-        result.username,
-        result.email,
-        result.bnetId,
-        result.bnetAccessToken
-      );
+      const user = {
+        id: result.id,
+        username: result.username,
+        email: result.email,
+        bnetId: result.bnetId,
+        bnetAccessToken: result.bnetAccessToken,
+      };
 
       // Store the user information in the session
       req.session.user = user;
-
-      // Set response headers [cors is annoying]
-      res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-      res.setHeader("Access-Control-Allow-Credentials", "true");
 
       // Return the status and user to the client
       res.status(200).json(user);

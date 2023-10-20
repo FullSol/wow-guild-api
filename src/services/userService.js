@@ -3,9 +3,9 @@
 const bcrypt = require("bcrypt");
 const saltRounds = 10; // Number of salt rounds for hashing
 const {
-  createSchema,
-  updateSchema,
-} = require("../validations/userValidations");
+  UserCreateSchema: createSchema,
+  UserUpdateSchema: updateSchema,
+} = require("../validations");
 
 const {
   AggregateValidationError,
@@ -112,6 +112,7 @@ class UserService extends BaseService {
         username: userDTOWithoutId.username,
         password: password_hash,
         email: userDTOWithoutId.email,
+        bnetId: userDTOWithoutId.bnetId,
         bnetAccessToken: userDTOWithoutId.bnetAccessToken,
       };
 
@@ -178,13 +179,6 @@ class UserService extends BaseService {
     } catch (error) {
       this._handleServiceError(this.constructor.name, "authenticate", error);
     }
-  };
-
-  authBnet = () => {
-    try {
-      console.log(this.constructor.name + ": bnetAuth");
-      return "getting there";
-    } catch (error) {}
   };
 }
 
