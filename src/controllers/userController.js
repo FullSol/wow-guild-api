@@ -251,26 +251,6 @@ class UserController extends BaseController {
       );
     }
   }
-
-  async authBnet(req, res) {
-    console.log("controller is being called");
-    const uniqueValue = Math.random().toString(36).substring(7);
-    await this.passport.authenticate("bnet", { state: uniqueValue });
-    console.log("controller end");
-  }
-
-  async authBnetCallback(req, res) {
-    this.passport.authenticate("bnet", { failureRedirect: "/" })(
-      req,
-      res,
-      () => {
-        const { username } = req.user;
-        req.session.user = req.user;
-
-        res.redirect(`http://localhost:3000/`);
-      }
-    );
-  }
 }
 
 module.exports = UserController;

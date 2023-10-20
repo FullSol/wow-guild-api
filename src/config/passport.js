@@ -24,7 +24,7 @@ passport.use(
     {
       clientID: process.env.BNET_CLIENT_ID,
       clientSecret: process.env.BNET_CLIENT_SECRET,
-      callbackURL: "http://localhost:3001/api/v1/users/auth/bnet/callback",
+      callbackURL: "http://localhost:3001/auth/bnet/callback",
       passReqToCallback: true,
       scope: ["wow.profile"],
     },
