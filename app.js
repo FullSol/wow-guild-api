@@ -11,16 +11,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const isProtected = require("./src/middlewares/isProtected");
 
-// Proxy
-const { createProxyMiddleware } = require("http-proxy-middleware");
-const bnetProxy = createProxyMiddleware({
-  target: "https://us.battle.net",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/auth/bnet": "/oauth", // Modify the path as needed
-  },
-});
-
 // Environment Variables
 const sessionSecret =
   process.env.SESSION_SECRET || "this_is_the_song_that_never_ends";
@@ -86,31 +76,31 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+// bnet auth
+// const uniqueValue = Math.random().toString(36).substring(7);
+// app.get(
+//   "/api/v1/auth/bnet",
+//   isProtected,
+//   passport.authenticate("bnet", { state: uniqueValue })
+// );
+
 // Mount the routes onto the app
 app.use("/api/v1", apiRoutes);
 
-// bnet auth
-const uniqueValue = Math.random().toString(36).substring(7);
-app.get(
-  "/auth/bnet",
-  isProtected,
-  passport.authenticate("bnet", { state: uniqueValue })
-);
-
 // bnet callback
-app.get(
-  "/auth/bnet/callback",
-  isProtected,
-  passport.authenticate("bnet", { failureRedirect: "/" }),
-  function (req, res) {
-    req.session.user = req.user;
+// app.get(
+//   "/auth/bnet/callback",
+//   isProtected,
+//   passport.authenticate("bnet", { failureRedirect: "/" }),
+//   function (req, res) {
+//     req.session.user = req.user;
 
-    // Send a JSON response to the client
-    res
-      .status(200)
-      .json({ success: true, message: "Authentication successful" });
-  }
-);
+//     // Send a JSON response to the client
+//     res
+//       .status(200)
+//       .json({ success: true, message: "Authentication successful" });
+//   }
+// );
 
 // 404 and error handler
 app.use(function (req, res, next) {
