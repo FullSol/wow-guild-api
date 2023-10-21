@@ -10,8 +10,20 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.User, {
-        foreignKey: "userId", // Specify the foreign key to link User and Character
-        as: "user", // Set an alias for the association
+        foreignKey: "userId",
+        as: "user",
+      });
+      this.belongsTo(models.Guild, {
+        foreignKey: "guildId",
+        as: "guild",
+      });
+      this.belongsTo(models.PlayableRace, {
+        foreignKey: "playableRaceId",
+        as: "playableRace",
+      });
+      this.belongsTo(models.PlayableClass, {
+        foreignKey: "playableClassId",
+        as: "playableClass",
       });
     }
   }
@@ -31,16 +43,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      realm: {
-        type: DataTypes.STRING,
+      playableClassId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      playableClass: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      playableRace: {
-        type: DataTypes.STRING,
+      playableRaceId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       gender: {
@@ -54,6 +62,14 @@ module.exports = (sequelize, DataTypes) => {
       level: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      realmId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      guildId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
     },
     {
