@@ -15,6 +15,10 @@ module.exports = {
           type: Sequelize.UUID,
           allowNull: false,
           defaultValue: Sequelize.UUIDV4,
+          references: {
+            model: "Users",
+            key: "id",
+          },
         },
         bnetId: {
           unique: true,
@@ -29,13 +33,21 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        playableClass: {
-          type: Sequelize.STRING,
+        playableClassId: {
+          type: Sequelize.INTEGER,
           allowNull: false,
+          references: {
+            model: "PlayableClasses",
+            key: "id",
+          },
         },
-        playableRace: {
-          type: Sequelize.STRING,
+        playableRaceId: {
+          type: Sequelize.INTEGER,
           allowNull: false,
+          references: {
+            model: "PlayableRaces",
+            key: "id",
+          },
         },
         gender: {
           type: Sequelize.STRING,
@@ -48,6 +60,14 @@ module.exports = {
         level: {
           type: Sequelize.INTEGER,
           allowNull: false,
+        },
+        guildId: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+          references: {
+            model: "Guilds",
+            key: "id",
+          },
         },
         createdAt: {
           allowNull: false,
