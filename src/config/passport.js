@@ -1,5 +1,6 @@
 const passport = require("passport");
 const BnetStrategy = require("passport-bnet").Strategy;
+const logger = require("../logger");
 
 // Import models
 const { User, Profile, Character } = require("../models");
@@ -16,15 +17,13 @@ const userService = new UserService(User);
 const profileService = new ProfileService(Profile);
 const characterService = new CharacterService(Character);
 
-const logger = require("../logger");
-
 // Bnet Strategy
 passport.use(
   new BnetStrategy(
     {
       clientID: process.env.BNET_CLIENT_ID,
       clientSecret: process.env.BNET_CLIENT_SECRET,
-      callbackURL: "http://localhost:3001/auth/bnet/callback",
+      callbackURL: "http://localhost:3001/api/v1/users/auth/bnet/callback",
       passReqToCallback: true,
       scope: ["wow.profile"],
     },
@@ -90,7 +89,8 @@ passport.use(
         // Wrap up the passport strategy
         return done(null, user);
       } catch (error) {
-        console.log(error);
+        logger.info(`${this.constructor.name}: passport`);
+        logger.error(error);
         return done(error, null);
       }
     }
@@ -114,7 +114,6 @@ passport.deserializeUser(async (id, done) => {
 
 // Function to fetch user characters from Battle.net API
 async function fetchUserCharacters(accessToken) {
-  console.log("fetching characters");
   try {
     // Region for Blizzard request
     const region = "us";
@@ -133,6 +132,8 @@ async function fetchUserCharacters(accessToken) {
 
     // convert to json object
     const data = await response.json();
+
+    console.log(data);
 
     // Flatten the characters array and filter based on level
     const characters = data.wow_accounts

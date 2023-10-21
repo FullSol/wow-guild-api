@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 const isProtected = require("../../middlewares/isProtected");
 
-module.exports = (controller) => {
+module.exports = (controller, passport) => {
   // Route for authenticating a user
   router.post("/signin", controller.authenticate.bind(controller));
 
@@ -28,6 +28,27 @@ module.exports = (controller) => {
 
   // Route for deleting a user by userId
   router.delete("/:userId", controller.delete.bind(controller));
+
+  // bnet auth
+  const uniqueValue = Math.random().toString(36).substring(7);
+  router.get(
+    "/auth/bnet",
+    passport.authenticate("bnet", { state: uniqueValue })
+  );
+
+  // bnet callback
+  router.get(
+    "/auth/bnet/callback",
+    passport.authenticate("bnet", { failureRedirect: "/" }),
+    function (req, res) {
+      req.session.user = req.user;
+
+      // Send a JSON response to the client
+      res
+        .status(200)
+        .json({ success: true, message: "Authentication successful" });
+    }
+  );
 
   return router;
 };
