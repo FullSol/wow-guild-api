@@ -25,6 +25,7 @@
     "passport-bnet": "^2.0.0",
     "pug": "^3.0.2",
     "sequelize": "^6.32.1",
+    "simple-oauth2": "^5.0.0",
     "sinon-chai": "^3.7.0",
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1"
