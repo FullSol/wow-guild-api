@@ -17,17 +17,17 @@ const createSchema = Joi.object({
     "any.required": `name is a required field.`,
     "string.base": `name should be a type of 'text'.`,
   }),
-  realm: Joi.string().required().messages({
+  realmId: Joi.number().required().messages({
     "string.empty": `realm cannot be empty.`,
     "any.required": `realm is a required field.`,
     "string.base": `realm should be a type of 'text'.`,
   }),
-  playableClass: Joi.string().required().messages({
+  playableClassId: Joi.number().required().messages({
     "string.empty": `playableClass cannot be empty.`,
     "any.required": `playableClass is a required field.`,
     "string.base": `playableClass should be a type of 'text'.`,
   }),
-  playableRace: Joi.string().required().messages({
+  playableRaceId: Joi.number().required().messages({
     "string.empty": `playableRace cannot be empty.`,
     "any.required": `playableRace is a required field.`,
     "string.base": `playableRace should be a type of 'text'.`,

@@ -9,6 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.Character, {
+        onDelete: "NO ACTION",
+        onUpdate: "NO ACTION",
+      });
+      this.belongsTo(models.User, {
+        as: "GuildMaster",
+        foreignKey: "guildMasterUserId",
+        onDelete: "RESTRICT",
+        onUpdate: "NO ACTION",
+      });
     }
   }
   Guild.init(

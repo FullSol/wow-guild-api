@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.Character, {
+        onDelete: "CASCADE",
+      });
     }
   }
   Realm.init(
@@ -17,6 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
     },
     {

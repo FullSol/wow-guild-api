@@ -29,9 +29,13 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        realm: {
-          type: Sequelize.STRING,
+        realmId: {
+          type: Sequelize.INTEGER,
           allowNull: false,
+          references: {
+            model: "Realms",
+            key: "id",
+          },
         },
         playableClassId: {
           type: Sequelize.INTEGER,
@@ -81,7 +85,7 @@ module.exports = {
       {
         uniqueKeys: {
           Characters_unique: {
-            fields: ["name", "realm"],
+            fields: ["name", "realmId"],
           },
         },
       }

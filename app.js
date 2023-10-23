@@ -6,10 +6,10 @@ const fs = require("fs");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const rateLimit = require("express-rate-limit");
-const passport = require("./src/config/passport");
+const passport = require("passport");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const isProtected = require("./src/middlewares/isProtected");
+require("./src/config/passportConfig");
 
 // Environment Variables
 const sessionSecret =

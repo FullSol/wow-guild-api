@@ -9,7 +9,15 @@ const guildApiRoutes = require("./guildRoutes");
 const router = express.Router();
 
 // Import the models
-const { User, Profile, Character, Guild } = require("../../models");
+const {
+  User,
+  Profile,
+  Character,
+  Guild,
+  PlayableRace,
+  PlayableClass,
+  Realm,
+} = require("../../models");
 
 // Import the services
 const {
@@ -18,6 +26,10 @@ const {
   CharacterService,
   GuildService,
   OAuthClient,
+  BnetService,
+  PlayableRaceService,
+  PlayableClassService,
+  RealmService,
 } = require("../../services");
 
 module.exports = (passport) => {
@@ -29,6 +41,15 @@ module.exports = (passport) => {
   const profileService = new ProfileService(Profile);
   const characterService = new CharacterService(Character);
   const guildService = new GuildService(Guild, oAuthClient);
+  const playableRaceService = new PlayableRaceService(PlayableRace);
+  const playableClassService = new PlayableClassService(PlayableClass);
+  const realmService = new RealmService(Realm);
+  const bnetService = new BnetService(
+    playableClassService,
+    playableRaceService,
+    realmService,
+    characterService
+  );
 
   // Import the controllers
   const {
@@ -39,7 +60,7 @@ module.exports = (passport) => {
   } = require("../../controllers/");
 
   // Inject services into the controllers
-  const userController = new UserController(userService);
+  const userController = new UserController(userService, bnetService);
   const profileController = new ProfileController(profileService);
   const characterController = new CharacterController(characterService);
   const guildController = new GuildController(guildService);

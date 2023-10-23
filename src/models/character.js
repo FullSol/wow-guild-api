@@ -11,19 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.User, {
         foreignKey: "userId",
-        as: "user",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       });
       this.belongsTo(models.Guild, {
         foreignKey: "guildId",
-        as: "guild",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       this.belongsTo(models.PlayableRace, {
         foreignKey: "playableRaceId",
-        as: "playableRace",
+        onDelete: "RESTRICT",
+        onUpdate: "CASCADE",
       });
       this.belongsTo(models.PlayableClass, {
         foreignKey: "playableClassId",
-        as: "playableClass",
+        onDelete: "RESTRICT",
+        onUpdate: "CASCADE",
       });
     }
   }

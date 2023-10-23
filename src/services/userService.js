@@ -53,6 +53,7 @@ class UserService extends BaseService {
 
   readById = async (id) => {
     try {
+      console.log(id);
       // Attempt to retrieve information from the DB
       const result = await this.Repo.findByPk(id);
 

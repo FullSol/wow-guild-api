@@ -5,9 +5,9 @@ const BaseController = require("./baseController");
 const { CreateUserDTO, UpdateUserDTO, LoginDTO, UserDTO } = require("../dtos/");
 
 class UserController extends BaseController {
-  constructor(service, passport) {
+  constructor(service, bnetService) {
     super(service);
-    this.passport = passport;
+    this.bnetService = bnetService;
   }
 
   async authenticate(req, res) {
@@ -247,6 +247,32 @@ class UserController extends BaseController {
         res,
         this.constructor.name,
         "delete",
+        error
+      );
+    }
+  }
+
+  async handleBnetCallback(req, res) {
+    try {
+      // Set the user into the session [passport upset the session]
+      req.session.user = req.user;
+
+      const user = req.session.user;
+
+      // have the bnetService handle the updates
+      const result = await this.bnetService.handleCallback(
+        user.id,
+        user.bnetAccessToken
+      );
+      // TODO: What comes next?
+
+      res.status(200).send("Stuff Happened");
+    } catch (error) {
+      this._handleControllerError(
+        req,
+        res,
+        this.constructor.name,
+        "handleBnetCallback",
         error
       );
     }

@@ -40,14 +40,7 @@ module.exports = (controller, passport) => {
   router.get(
     "/auth/bnet/callback",
     passport.authenticate("bnet", { failureRedirect: "/" }),
-    function (req, res) {
-      req.session.user = req.user;
-
-      // Send a JSON response to the client
-      res
-        .status(200)
-        .json({ success: true, message: "Authentication successful" });
-    }
+    controller.handleBnetCallback.bind(controller)
   );
 
   return router;
