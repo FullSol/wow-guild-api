@@ -264,9 +264,12 @@ class UserController extends BaseController {
         user.id,
         user.bnetAccessToken
       );
-      // TODO: What comes next?
 
-      res.status(200).send("Stuff Happened");
+      res
+        .status(200)
+        .send(
+          "Battle.net has been connected<br/><br/>You may close this window."
+        );
     } catch (error) {
       this._handleControllerError(
         req,

@@ -20,7 +20,8 @@ module.exports = {
       },
       guildMasterUserId: {
         type: Sequelize.UUID,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
         references: {
           model: "Users",
           key: "id",

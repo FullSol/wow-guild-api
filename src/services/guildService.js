@@ -9,57 +9,27 @@ class GuildService extends BaseService {
     this.oAuthClient = oAuthClient;
   }
 
-  create = async (guildDTO) => {
+  upsert = async (newGuild) => {
+    console.log(newGuild);
     try {
-      // Validate the incoming data
+      // // Validate the new playable class
+      //   const { error } = this.createSchema.validate(newGuild);
+      //
+      // // Check for errors in the validation
+      //   if (error) {
+      //     throw new AggregateValidationError(
+      //       this._createErrorsArray(error),
+      //       "Unable to validate the guild"
+      //     );
+      //   }
 
-      // Check for errors in the validation
+      // Attempt to save the new guild
+      const result = await this.Repo.upsert(newGuild);
 
-      const { realm, guildName } = guildDTO;
-
-      const apiUrl = `https://us.api.blizzard.com`;
-      const apiUri = `/data/wow/guild/${realm}/${guildName}`;
-      const namespace = `profile-us`;
-      const locale = `en_US`;
-      const access_token = `${apiKey}`;
-      const requestUri =
-        apiUrl + apiUri + "?" + namespace + "&" + locale + "&" + access_token;
-
-      // Attempt to pull the information from the Blizzard API
-      const response = fetch(requestUri)
-        .then((response) => response.json())
-        .then((data) => {
-          return data;
-        })
-        .catch((error) => {
-          console.error("Error fetching guild information:", error);
-        });
-
-      // Check the results
-      console.log(response);
-
-      // Create DTO from blizzard Data
-      const bnetGuildDTO = {};
-
-      // Attempt to insert the new guild into DB
-      const result = await this.Repo.create(bnetGuildDTO);
-
-      // Return the results
+      // Return the  result
       return result;
     } catch (error) {
       this._handleServiceError(this.constructor.name, "create", error);
-    }
-  };
-
-  readAll = async () => {
-    try {
-      // Attempt to retrieve information from the DB
-      const result = await this.Repo.findAll();
-
-      // Return the results
-      return result;
-    } catch (error) {
-      this._handleServiceError(this.constructor.name, "readAll", error);
     }
   };
 }

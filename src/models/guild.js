@@ -33,7 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       guildMasterUserId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
       },
     },
     {

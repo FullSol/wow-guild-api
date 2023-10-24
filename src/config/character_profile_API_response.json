@@ -1,0 +1,124 @@
+{
+    "_links": {
+      "self": {
+        "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha?namespace=profile-us"
+      }
+    },
+    "id": 236798355,
+    "name": "Solmaetcha",
+    "gender": {
+      "type": "FEMALE",
+      "name": "Female"
+    },
+    "faction": {
+      "type": "HORDE",
+      "name": "Horde"
+    },
+    "race": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/playable-race/70?namespace=static-10.1.7_51059-us"
+      },
+      "name": "Dracthyr",
+      "id": 70
+    },
+    "character_class": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/playable-class/13?namespace=static-10.1.7_51059-us"
+      },
+      "name": "Evoker",
+      "id": 13
+    },
+    "active_spec": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/playable-specialization/1473?namespace=static-10.1.7_51059-us"
+      },
+      "name": "Augmentation",
+      "id": 1473
+    },
+    "realm": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/realm/1566?namespace=dynamic-us"
+      },
+      "name": "Area 52",
+      "id": 1566,
+      "slug": "area-52"
+    },
+    "guild": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/guild/area-52/wings?namespace=profile-us"
+      },
+      "name": "Wings",
+      "id": 115854254,
+      "realm": {
+        "key": {
+          "href": "https://us.api.blizzard.com/data/wow/realm/1566?namespace=dynamic-us"
+        },
+        "name": "Area 52",
+        "id": 1566,
+        "slug": "area-52"
+      },
+      "faction": {
+        "type": "HORDE",
+        "name": "Horde"
+      }
+    },
+    "level": 70,
+    "experience": 0,
+    "achievement_points": 22025,
+    "achievements": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/achievements?namespace=profile-us"
+    },
+    "titles": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/titles?namespace=profile-us"
+    },
+    "pvp_summary": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/pvp-summary?namespace=profile-us"
+    },
+    "encounters": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/encounters?namespace=profile-us"
+    },
+    "media": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/character-media?namespace=profile-us"
+    },
+    "last_login_timestamp": 1697774425000,
+    "average_item_level": 447,
+    "equipped_item_level": 447,
+    "specializations": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/specializations?namespace=profile-us"
+    },
+    "statistics": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/statistics?namespace=profile-us"
+    },
+    "mythic_keystone_profile": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/mythic-keystone-profile?namespace=profile-us"
+    },
+    "equipment": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/equipment?namespace=profile-us"
+    },
+    "appearance": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/appearance?namespace=profile-us"
+    },
+    "collections": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/collections?namespace=profile-us"
+    },
+    "active_title": {
+      "key": {
+        "href": "https://us.api.blizzard.com/data/wow/title/39?namespace=static-10.1.7_51059-us"
+      },
+      "name": "Hand of A'dal",
+      "id": 39,
+      "display_string": "{name}, Hand of A'dal"
+    },
+    "reputations": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/reputations?namespace=profile-us"
+    },
+    "quests": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/quests?namespace=profile-us"
+    },
+    "achievements_statistics": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/achievements/statistics?namespace=profile-us"
+    },
+    "professions": {
+      "href": "https://us.api.blizzard.com/profile/wow/character/area-52/solmaetcha/professions?namespace=profile-us"
+    }
+  }

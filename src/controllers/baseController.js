@@ -5,12 +5,13 @@ const logger = require("../logger");
 class BaseController {
   constructor(service) {
     this.service = service;
+    this.logger = logger;
   }
 
   _handleControllerError(req, res, controllerName, methodName, error) {
     // Log the error
-    logger.info(`${controllerName}: ${methodName}`);
-    logger.error(error);
+    this.logger.info(`${controllerName}: ${methodName}`);
+    this.logger.error(error);
 
     // Pull errors array from the error if exists
     const { errors } = error;
